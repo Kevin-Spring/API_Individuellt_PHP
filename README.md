@@ -55,14 +55,14 @@
 ## v1/carts/checkout.php
     1. Användare ska kunna klicka på en knapp och få bekräftelse på sina produkter från varukorgen.
      
-# Användning
+# Användning:
 
-## 1.Registerar användare.
+## 1. Registerar användare.
 
-## 2.Logga in för att få token.
+## 2. Logga in för att få token.
 
-## 3.Lägg till produkter i databasen.
+## 3. Lägg till produkter i databasen.
 
-## 4.Lek omkring!
+## 4. Lek omkring!
 
 ### OBS. Man måste ha koll på sina produkters id själv!
