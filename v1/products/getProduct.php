@@ -13,7 +13,7 @@ if(!empty($token_IN)){
 
     $retObject = new stdClass;
 
-    if($user_handler->validateToken($tokenId) === false) {
+    if($user_handler->validateToken($token_IN) === false) {
        
         $retObject->error =  "Invalid token!";
      
@@ -21,8 +21,7 @@ if(!empty($token_IN)){
     
         if($productID > -1) {
     
-            $product_handler->setProductId($productID);
-            echo $product_handler->fetchSingleProduct();
+            echo $product_handler->fetchSingleProduct($productID);
             die();
     
         } else {

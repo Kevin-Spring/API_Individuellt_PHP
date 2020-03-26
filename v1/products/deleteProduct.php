@@ -23,7 +23,7 @@ if(!empty($token_IN)){
             $retObject->error = "Token is invalid";
             die();
         }
-
+        
         echo $products_handler->deleteProduct($_POST);
         die();
 

@@ -106,11 +106,11 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
             $statementHandler->bindParam(":product_id", $product_id);
 
-            $statementHandler->execute();
-
             $return = $this->getSingleCartItem($product_id);
 
             if($return !== false){
+
+                $statementHandler->execute();
 
                 $return_object->state = "SUCCESS";
                 $return_object->message = "Product " . $product_id . " was deleted from your cart.";
@@ -135,7 +135,8 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
     }
 
-
+    //Tänka sig, ytterligare en funktion...
+    //Funktion som hämtar produkterna som ligger i vår varukorg.
     private function getCartItems(){
 
         $return_object = new stdClass;
@@ -166,6 +167,8 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
     }
 
+    //Funktion som hämtar specifik produkt från vår varukorg.
+    //Främst för att kunna använda den i funktionen removeFromCart
     private function getSingleCartItem($product_id_remove){
         $return_object = new stdClass;
 
@@ -197,11 +200,6 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
         return json_encode($return_object);
     }
-
-
-    
-
-
 
 }
 

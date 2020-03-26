@@ -5,17 +5,13 @@ include("../../config/database_handler.php");
 class Product{
 
     private $database_handler;
-    private $product_id;
 
     public function __construct($database_handler_IN) {
         $this->database_handler = $database_handler_IN;
     }
 
-    public function setProductId($product_id_IN) {
-        $this->product_id = $product_id_IN;
-    }
-
-    public function fetchSingleProduct() {
+    //Funktion som hämtar enskilda produkter
+    public function fetchSingleProduct($product_id) {
 
     $return_object = new stdClass();
     
@@ -24,7 +20,7 @@ class Product{
     
     if($statementHandler !== false) {
 
-        $statementHandler->bindParam(":product_id", $this->product_id);
+        $statementHandler->bindParam(":product_id", $product_id);
         $statementHandler->execute();
     
         $return = $statementHandler->fetch();
@@ -36,7 +32,13 @@ class Product{
 
         } else {
             $return_object->state = "ERROR";
-            $return_object->message = "product: ". $this->product_id." was not found";
+            $return_object->message = "product: ". $product_id." was not found";
+            //Här måste jag echo:a ut mitt errormeddelande eftersom deleteProduct behöver "return false" för att kunna fungera korrekt.
+            //Om jag bara skulle returnera false visas inget felmeddelande när den här funktionen körs ensam.
+            //Finns säkert bättre lösning.
+            echo json_encode($return_object);
+            return false;
+            
         }
     
     } else {
@@ -49,6 +51,7 @@ class Product{
 
     }
     
+    //Funktion som hämtar alla våra produkter
     public function fetchAllProdcuts() {
 
     $return_object = new stdClass();
@@ -75,6 +78,8 @@ class Product{
         }
 
     
+    //Funktion som är överflödig, vad gör den här?
+    //Fin är den iaf.
     public function addProduct($title_param, $content_param, $category_param, $price_param) {
         $return_object = new stdClass();
     
@@ -95,6 +100,7 @@ class Product{
         return json_encode($return_object);
     }
 
+    //Funktion som ägnar sig åt att lägga in prdukter i vår databas
     private function insertProductToDatabase($title_param_IN, $content_param_IN, $category_param_IN, $price_param_IN){
         $query_string = "INSERT INTO products (title, content, category, price) VALUES(:title_IN, :content_IN, :category_IN, :price_IN)";
         $statementHandler = $this->database_handler->prepare($query_string);
@@ -126,7 +132,8 @@ class Product{
         }
     }
 
-
+    //Funktion för att kunna redigera produkter i databasen
+    //Speciellt specificerad för att kunna uppdatera enskilda värden dessutom
     public function updateProduct($data){
 
         $return_object = new stdClass();
@@ -150,7 +157,6 @@ class Product{
 
             }
 
-
         }
 
         if(!empty($data['content'])){
@@ -171,7 +177,6 @@ class Product{
                 $return_object->message = "Something went wrong when trying to UPDATE products CONTENT";
 
             }
-
 
         }
 
@@ -194,9 +199,6 @@ class Product{
 
             }
 
-            
-
-
         }
 
         if(!empty($data['price'])){
@@ -217,9 +219,6 @@ class Product{
                 $return_object->message = "Something went wrong when trying to UPDATE products PRICE";
 
             }
-
-            
-
 
         }
 
@@ -250,6 +249,7 @@ class Product{
 
     }
 
+    //Funktion för att kunna radera produkter ur databas
     public function deleteProduct($data){
 
         $return_object = new stdClass();
@@ -261,10 +261,20 @@ class Product{
 
             $statementHandler->bindParam(":product_id", $data['id']);
 
-            $statementHandler->execute();
+            $return = $this->fetchSingleProduct($data['id']);
 
-            $return_object->state = "SUCCESS";
-            $return_object->message = "Product " . $data['id'] . " was deleted from database.";
+            //Här kan jag inte göra checken om !empty($return) eftersom funktionen fetchSingleProduct(), kommer med json-meddelanden
+            if($return !== false){
+
+                $statementHandler->execute();
+                $return_object->state = "SUCCESS";
+                $return_object->message = "Product " . $data['id'] . " was deleted.";
+            } else {
+            //Här behövs inget else statement som säger att produkten inte hittades 
+            //eftersom det ligger ett sånt i fetchSingleProduct.
+                die();
+            }
+           
 
         } else {
 
