@@ -82,8 +82,8 @@
 
         <form class="form">
             <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/addProducts.php" /><br />
+            <input type="text" name="token" placeholder="token" /><br />
             <input type="text" name="title" placeholder="title" /><br />
-            <!-- <input type="number" name="id" placeholder="id" /><br /> -->
             <textarea name="content" placeholder="content"></textarea><br />
             <input type="text" name="category" placeholder="category" /><br />
             <input type="number" name="price" placeholder="price" /><br />
@@ -140,8 +140,8 @@
 
     <form class="form">
         <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/getProduct.php" /><br />
-        <input type="number" name="product_id" placeholder = "product id"> <br>
         <input type="text" name="token" placeholder="token" /><br />
+        <input type="number" name="product_id" placeholder = "product id"> <br>
         GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
             value="post" /><br />
         <input type="submit" />
@@ -153,8 +153,8 @@
 
     <form class="form">
         <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/addProductsToCart.php" /><br />
-        <input type="number" name="product_id" placeholder = "product id"> <br>
         <input type="text" name="token" placeholder="token" /><br />
+        <input type="number" name="product_id" placeholder = "product id"> <br>
         GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
             value="post" /><br />
         <input type="submit" />
@@ -166,8 +166,8 @@
 
     <form class="form">
         <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/removeProductsFromCart.php" /><br />
-        <input type="number" name="product_id" placeholder = "product id"> <br>
         <input type="text" name="token" placeholder="token" /><br />
+        <input type="number" name="product_id" placeholder = "product id"> <br>
         GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
             value="post" /><br />
         <input type="submit" />

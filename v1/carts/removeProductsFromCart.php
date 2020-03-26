@@ -7,30 +7,35 @@ $products_handler = new Product($databaseHandler);
 $user_handler = new User($databaseHandler);
 $cart_handler = new Cart($databaseHandler);
 
-if(!empty($_POST['token'])){
+$productID = ( isset($_POST['product_id'] ) ? $_POST['product_id'] : '' );
+$token_IN = ( isset($_POST['token']) ? $_POST['token'] : '' );
 
-    if(!empty($_POST['product_id'])){
+if(!empty($token_IN)){
 
-        $token = $_POST['token'];
+    $retObject = new stdClass();
+
+    if(!empty($productID)){
+
+        $token = $token_IN;
 
         if($user_handler->validateToken($token) === false){
-            $retObject = new stdClass();
+           
             $retObject->error = "Token is invalid";
-            echo json_encode($retObject);
-            die();
+            
         }
 
-        echo $cart_handler->removeFromCart($_POST['product_id']);
+        echo $cart_handler->removeFromCart($productID);
+        die();
 
 
     } else {
 
-        $retObject = new stdClass();
         $retObject->error = "No prodcut id found!";
-        echo json_encode($retObject);
     
     } 
     
+    echo json_encode($retObject);
+
 } else {
 
         $retObject = new stdClass();

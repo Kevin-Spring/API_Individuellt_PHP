@@ -38,7 +38,7 @@ class Cart{
                         $return_object->products_in_cart = $this->getCartItems();   
                     } else {
                         $return_object->state = "ERROR";
-                        $return_object->message = "Something went wrong when trying to INSERT product into cart";
+                        $return_object->message = "Could not find that specific product!";
                     }
 
                 } else {
@@ -108,9 +108,21 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
             $statementHandler->execute();
 
-            $return_object->state = "SUCCESS";
-            $return_object->message = "Product " . $product_id . " was deleted from database.";
-            $return_object->products_in_cart = $this->getCartItems();
+            $return = $this->getSingleCartItem($product_id);
+
+            if($return !== false){
+
+                $return_object->state = "SUCCESS";
+                $return_object->message = "Product " . $product_id . " was deleted from your cart.";
+                $return_object->products_in_cart = $this->getCartItems();
+
+            } else {
+
+                $return_object->state = "ERROR";
+                $return_object->message = "product was not found";
+                $return_object->products_in_cart = $this->getCartItems();
+
+            }
 
         } else {
 
@@ -135,18 +147,55 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
     
             $statementHandler->execute();
             $return = $statementHandler->fetchAll();
-    
-            $return_object->state = "SUCCESS";
-            $return_object->product = $return;
-        
+
+            if(!empty($return)){
+                $return_object->state = "SUCCESS";
+                $return_object->product = $return;
             } else {
                 $return_object->state = "ERROR";
-                $return_object->message = "Something went wrong when trying to FETCH ALL products from CART";
-                die();
-            }
+                $return_object->message = "products was not found";
+            }  
+        
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "Something went wrong when trying to FETCH ALL products from CART";
+            die();
+        }
     
-            return json_encode($return_object);
+        return json_encode($return_object);
 
+    }
+
+    private function getSingleCartItem($product_id_remove){
+        $return_object = new stdClass;
+
+        $query_string = "SELECT products_id FROM carts WHERE products_id = :product_id_remove";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false){
+
+            $statementHandler->bindParam(":product_id_remove", $product_id_remove);
+            $statementHandler->execute();
+
+            $return = $statementHandler->fetch();
+
+            if(!empty($return)){
+
+                $return_object->state = "SUCCESS";
+                $return_object->product = $return;
+
+            } else {
+                return false;
+            }
+
+
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "Something went wrong when trying to FETCH your product from CART";
+            die();
+        }
+
+        return json_encode($return_object);
     }
 
 
