@@ -29,13 +29,19 @@ class Product{
     
         $return = $statementHandler->fetch();
 
-        $return_object->state = "SUCCESS";
-        $return_object->product = $return;
-        
+        if(!empty($return)){
+
+            $return_object->state = "SUCCESS";
+            $return_object->product = $return;
+
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "product: ". $this->product_id." was not found";
+        }
     
     } else {
             $return_object->state = "ERROR";
-            $return_object->message = "Something went wrong when trying to FETCH product";
+            $return_object->message = "Something went wrong with STATEMENTHANDLER";
         die();
     }
 

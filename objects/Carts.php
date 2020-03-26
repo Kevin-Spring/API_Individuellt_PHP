@@ -15,8 +15,8 @@ class Cart{
     public function addToCart($product_id, $token_id){
         $return_object = new stdClass;
 
-        //Först för att kunna lägga i nått i vår varukorg behvöer vi id:et från vår token
-        //För att hålla våra foreign keys löften
+        //Först för att kunna lägga nått i vår varukorg behöver vi id:et från vår token.
+        //DVS för att hålla våra foreign keys löften.
         $query_string = "SELECT id FROM tokens WHERE token=:token";
         $statementHandler = $this->database_handler->prepare($query_string);
 
@@ -34,7 +34,8 @@ class Cart{
 
                     if($return !== false){
                         $return_object->state = "SUCCESS";
-                        $return_object->message = "Product " . $product_id . " was added to your shoppingcart";    
+                        $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
+                        $return_object->products_in_cart = $this->getCartItems();   
                     } else {
                         $return_object->state = "ERROR";
                         $return_object->message = "Something went wrong when trying to INSERT product into cart";
@@ -42,7 +43,8 @@ class Cart{
 
                 } else {
                     //Eftersom vår token raderas i tabellen "tokens" efter en kvart,
-                    //Så kommer den även raderas i vår tabell "carts" i och med vår foreign key-relation.
+                    //Så kommer den även raderas i vår tabell "carts" i och med våra foreign key-relationer.
+                    //Lord praise mysql "CASCADE".
                     $return_object->state = "ERROR";
                     $return_object->message = "Your token has expired!!";
                 }
@@ -58,7 +60,7 @@ class Cart{
 }
 
     
-
+//Vår funktion för att faktiskt lägga in produkten och användarens token i databasen.
 private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
         $query_string = "INSERT INTO carts(products_id, tokens_id) VALUES(:productID, :tokenID)";
@@ -89,7 +91,7 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
     }
 
-
+    //Funktion för att kunna ta bort enskilda produkter ur varukorgen
     public function removeFromCart($product_id){
 
         $return_object = new stdClass();
@@ -108,6 +110,7 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
             $return_object->state = "SUCCESS";
             $return_object->message = "Product " . $product_id . " was deleted from database.";
+            $return_object->products_in_cart = $this->getCartItems();
 
         } else {
 
@@ -117,6 +120,32 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
         }
 
         return json_encode($return_object);
+
+    }
+
+
+    private function getCartItems(){
+
+        $return_object = new stdClass;
+
+        $query_string = "SELECT products_id FROM carts";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false) {
+    
+            $statementHandler->execute();
+            $return = $statementHandler->fetchAll();
+    
+            $return_object->state = "SUCCESS";
+            $return_object->product = $return;
+        
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Something went wrong when trying to FETCH ALL products from CART";
+                die();
+            }
+    
+            return json_encode($return_object);
 
     }
 
