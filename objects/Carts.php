@@ -11,6 +11,7 @@ class Cart{
 
     }
 
+
     //Funktion för att kunna ta bort enskilda produkter ur varukorgen
     public function removeFromCart($product_id){
 
@@ -137,10 +138,33 @@ class Cart{
 
             if($token_data['id'] > 1){
 
-                $return_object->state = "SUCCESS";
-                $return_object->product = $this->insertIntoCheckout($token_data['id']);
-                
-                die();
+                $query_string = "SELECT id FROM carts2 WHERE tokens_id=:token_id";
+                $statementHandler = $this->database_handler->prepare($query_string);
+
+                $statementHandler->bindParam(":token_id", $token_data['id']);
+                $statementHandler->execute();
+
+                $carts_data = $statementHandler->fetch();
+
+                    if($carts_data['id'] > 1){
+
+
+                        $return = $this->insertIntoCheckout($carts_data['id']);
+
+                            if($return !== false){
+                                $return_object->state = "SUCCESS";
+                                $return_object->message = "Your have successfully checked out!";
+                                /* LÄGG IN FUNKTION SOM VISAR ALLT FRÅN CHECKOUT_TABELLEN */
+                                /* $return_object->products_in_cart = $this->getCartItems();  */  
+                            } else {
+                                $return_object->state = "ERROR";
+                                $return_object->message = "Could not check out order!";
+                            }
+
+                    } else {
+                        $return_object->state = "ERROR";
+                        $return_object->message = "Please create a shoppingcart!";
+                    }
 
             } else {
                 $return_object->state = "ERROR";
@@ -151,41 +175,22 @@ class Cart{
         } else {
             $return_object->state = "ERROR";
             $return_object->message = "Something went wrong when trying to CHECKOUT your products from CART";
-            die();
         }
 
         return json_encode($return_object);
 
     }
 
-    private function insertIntoCheckout($token_ID_IN){
+    private function insertIntoCheckout($carts_ID_IN){
 
-        $query_string = "SELECT carts.id FROM carts WHERE tokens_id = :token_id_in"; 
+        $query_string = "INSERT INTO checkout(carts_id) VALUES(:cart_id_in)"; 
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false){
 
-            $statementHandler->bindParam(":token_id_in", $token_ID_IN);
+            $statementHandler->bindParam(":cart_id_in", $carts_ID_IN);
             $statementHandler->execute();
-            $cart_data =  $statementHandler->fetch();
 
-            if($cart_data > 1){
-
-                $query_string = "INSERT INTO checkout(carts_id, tokens_id) VALUES(:cart_id_in, :token_id_in)";
-                $statementHandler = $this->database_handler->prepare($query_string);
-        
-                if($statementHandler !== false){
-        
-                    $statementHandler->bindParam(":cart_id_in", $cart_data['id']);
-                    $statementHandler->bindParam(":token_id_in", $token_ID_IN);
-                    $statementHandler->execute();
-        
-                } else {
-                    echo "Could not insert into checkout";
-                }
-            } else {
-                echo "Could not find the cart!";
-            }
         } else {
             echo "statementhandler fucked up!";
         }
