@@ -6,6 +6,8 @@ $product_handler = new Product($databaseHandler);
 $user_handler = new User($databaseHandler);
 
 $token_IN = ( isset($_POST['token']) ? $_POST['token'] : '' );
+$selected_option = ( isset($_POST['category']) ? $_POST['category'] : '' );
+$order = ( isset($_POST['order']) ? $_POST['order'] : '' );
 
 if(!empty($token_IN)){
     $retObject = new stdClass;
@@ -15,7 +17,7 @@ if(!empty($token_IN)){
         $retObject->error = "Invalid token!";
 
     } else {
-        echo $product_handler->fetchAllProdcuts();
+        echo $product_handler->fetchAllProdcuts($selected_option, $order);
         die();
     }
 
