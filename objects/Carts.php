@@ -141,7 +141,7 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
 
         $return_object = new stdClass;
 
-        $query_string = "SELECT products_id FROM carts";
+        $query_string = "SELECT id, products_id FROM carts";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false) {
@@ -201,7 +201,81 @@ private function insertCartToDatabase($product_ID_IN, $token_ID_IN){
         return json_encode($return_object);
     }
 
+    public function checkout($token_id){
+
+        $return_object = new stdClass();
+
+        $query_string = "SELECT id FROM tokens WHERE token=:token";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false){
+
+            $statementHandler->bindParam(":token", $token_id);
+            $statementHandler->execute();
+
+            $token_data = $statementHandler->fetch();
+
+            if($token_data['id'] > 1){
+
+                $return_object->state = "SUCCESS";
+                $return_object->product = $this->insertIntoCheckout($token_data['id']);
+                
+                die();
+
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not find requested cart and insert into checkout";
+            }
+
+
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "Something went wrong when trying to CHECKOUT your products from CART";
+            die();
+        }
+
+        return json_encode($return_object);
+
+    }
+
+    private function insertIntoCheckout($token_ID_IN){
+
+        $query_string = "SELECT carts.id FROM carts WHERE tokens_id = :token_id_in"; 
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false){
+
+            $statementHandler->bindParam(":token_id_in", $token_ID_IN);
+            $statementHandler->execute();
+            $cart_data =  $statementHandler->fetch();
+
+            if($cart_data > 1){
+
+                $query_string = "INSERT INTO checkout(carts_id, tokens_id) VALUES(:cart_id_in, :token_id_in)";
+                $statementHandler = $this->database_handler->prepare($query_string);
+        
+                if($statementHandler !== false){
+        
+                    $statementHandler->bindParam(":cart_id_in", $cart_data['id']);
+                    $statementHandler->bindParam(":token_id_in", $token_ID_IN);
+                    $statementHandler->execute();
+        
+                } else {
+                    echo "Could not insert into checkout";
+                }
+            } else {
+                echo "Could not find the cart!";
+            }
+        } else {
+            echo "statementhandler fucked up!";
+        }
+
+    }
+
+
 }
+
+    
 
 
 

@@ -17,17 +17,15 @@ if(!empty($token_IN)){
 
     if(!empty($productID)){
 
-        $token = $token_IN;
-
-        if($user_handler->validateToken($token) === false){
+        if($user_handler->validateToken($token_IN) === false){
             
             $retObject->error = "Token is invalid";
 
+        } else {
+
+            echo $cart_handler->addToCart($productID, $token_IN);
+            die();
         }
-
-        echo $cart_handler->addToCart($productID, $token_IN);
-        die();
-
 
     } else {
 
@@ -39,9 +37,9 @@ if(!empty($token_IN)){
     
 } else {
 
-        $retObject = new stdClass();
-        $retObject->error = "No token found!";
-        echo json_encode($retObject);
+    $retObject = new stdClass();
+    $retObject->error = "No token found!";
+    echo json_encode($retObject);
 }
 
 
