@@ -23,7 +23,7 @@ if(!empty($token_IN)){
 
         } else {
 
-            echo $cart_handler->addToCart($productID, $token_IN);
+            echo $cart_handler->addToNewCart($productID, $token_IN);
             die();
         }
 
