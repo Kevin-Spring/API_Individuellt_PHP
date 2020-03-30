@@ -198,24 +198,57 @@ class Cart{
 
     }
 
-    public function createCart($token_id){
+    private function validateCart($token_id){
 
         $return_object = new stdClass();
 
+        $query_string = "SELECT COUNT(id) FROM carts2 WHERE tokens_id= :token_id";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+            if($statementHandler !== false ){
+
+                $statementHandler->bindParam(":token_id", $token_id);
+                $statementHandler->execute();
+
+                $numberOfCarts = $statementHandler->fetch()[0];
+
+                if($numberOfCarts < 1) {
+
+                    $this->createCart($token_id);
+                    $return_object->state = "SUCCESS!";
+                    $return_object->message = "Created cart for user";
+
+            } else {
+
+                $return_object->message = "User already have an active cart";
+
+            }
+
+        }
+
+        return json_encode($return_object);
+
+    }
+
+    private function createCart($token_id){
+
+        $return_object = new stdClass();
+                    
         $query_string = "INSERT INTO carts2(tokens_id) VALUES(:token_id_in)"; 
         $statementHandler = $this->database_handler->prepare($query_string);
 
-        if($statementHandler !== false){
+            if($statementHandler !== false){
 
                 $statementHandler->bindParam(":token_id_in", $token_id);
                 $statementHandler->execute();
-
+        
                 $return_object->state = "SUCCESS";
-
-        } else {
-            $return_object->state = "ERROR";
-            $return_object->message = "Could not create statementhadnler";
-        }
+                $return_object->message = "Created a cart for user.";
+        
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not create statementhadnler";
+                }        
 
         return json_encode($return_object);
 
@@ -240,7 +273,7 @@ class Cart{
     
                     if($token_data['id'] > 1){
 
-                        $this->createCart($token_data['id']);
+                        $this->validateCart($token_data['id']);
 
                         $query_string = "SELECT id FROM carts2 WHERE tokens_id=:token_id";
                         $statementHandler = $this->database_handler->prepare($query_string);
