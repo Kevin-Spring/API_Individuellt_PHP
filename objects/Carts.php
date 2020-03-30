@@ -179,7 +179,6 @@ class Cart{
         } else {
             $return_object->state = "ERROR";
             $return_object->message = "Something went wrong when trying to FETCH your product from CART";
-            die();
         }
 
         return json_encode($return_object);
@@ -416,11 +415,11 @@ class Cart{
 
         return $statementHandler->fetch();
 
-    } else {
-        return false;
-    }
+        } else {
+            return false;
+        }
 
-}
+    }
 
 }
 
