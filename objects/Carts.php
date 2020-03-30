@@ -58,15 +58,16 @@ class Cart{
 
     //Tänka sig, ytterligare en funktion...
     //Funktion som hämtar produkterna som ligger i vår varukorg.
-    private function getCartItems(){
+    private function getCartItems($cart_id){
 
         $return_object = new stdClass;
 
-        $query_string = "SELECT id, products_id FROM prodcutsInCarts";
+        $query_string = "SELECT id, products_id FROM prodcutsInCarts WHERE carts_id = :cart_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false) {
     
+            $statementHandler->bindParam(":cart_id", $cart_id);
             $statementHandler->execute();
             $return = $statementHandler->fetchAll();
 
@@ -257,7 +258,7 @@ class Cart{
                             if($return !== false){
                                 $return_object->state = "SUCCESS";
                                 $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
-                                $return_object->products_in_cart = $this->getCartItems();   
+                                $return_object->products_in_cart = $this->getCartItems($carts_data['id']);   
                             } else {
                                 $return_object->state = "ERROR";
                                 $return_object->message = "Could not find that specific product!";
