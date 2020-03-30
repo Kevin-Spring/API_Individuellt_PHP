@@ -24,7 +24,7 @@ if(!empty($token_IN)){
             
         }
 
-        echo $cart_handler->removeFromCart($productID);
+        echo $cart_handler->removeFromCart($productID, $token);
         die();
 
 

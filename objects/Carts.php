@@ -13,7 +13,70 @@ class Cart{
 
 
     //Funktion för att kunna ta bort enskilda produkter ur varukorgen
-    public function removeFromCart($product_id){
+    public function removeFromCart($product_id, $token_id){
+
+        $return_object = new stdClass();
+
+        //Först för att kunna ta bort nått ur vår varukorg behöver vi id:et från vår token.
+        $query_string = "SELECT id FROM tokens WHERE token=:token";
+        $statementHandler = $this->database_handler->prepare($query_string);
+    
+        if($statementHandler !== false ){
+    
+            $statementHandler->bindParam(":token", $token_id);
+            $statementHandler->execute();
+    
+            $token_data = $statementHandler->fetch();
+    
+                if($token_data['id'] > 1){
+
+                    $query_string = "SELECT id FROM carts2 WHERE tokens_id=:token_id";
+                    $statementHandler = $this->database_handler->prepare($query_string);
+
+                    $statementHandler->bindParam(":token_id", $token_data['id']);
+                    $statementHandler->execute();
+
+                    $carts_data = $statementHandler->fetch();
+
+                    if($carts_data['id'] > 1){
+
+                        //Om vårt fetchade id från token tabellen existerar skickar vi med det tillsammans med produktens id med vår removeFromCartDb funktion.
+                        $return = $this->removeFromCartDb($product_id);
+
+                            if($return !== false){
+                                $return_object->state = "SUCCESS";
+                                $return_object->message = "Product " . $product_id . " was removed from your shoppingcart";
+                                $return_object->products_in_cart = $this->getCartItems($carts_data['id']);   
+                            } else {
+                                $return_object->state = "ERROR";
+                                $return_object->message = "Could not find that specific product!";
+                                $return_object->products_in_cart = $this->getCartItems($carts_data['id']);  
+                            }
+
+                        } else {
+                            $return_object->state = "ERROR";
+                            $return_object->message = "Please create a shoppingcart!";
+                        }
+
+                    } else {
+                        //Eftersom vår token raderas i tabellen "tokens" efter en kvart,
+                        //Så kommer den även raderas i vår tabell "carts2" i och med våra foreign key-relationer.
+                        //Lord praise mysql "CASCADE".
+                        $return_object->state = "ERROR";
+                        $return_object->message = "Your token has expired!!";
+                    }
+    
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Satetement handler messed up!";
+            }
+
+        return json_encode($return_object);
+
+    }
+
+    //Funktion för att radera produkter från databas som ligger användares i varukorg
+    private function removeFromCartDb($product_id){
 
         $return_object = new stdClass();
 
@@ -33,15 +96,11 @@ class Cart{
 
                 $statementHandler->execute();
 
-                $return_object->state = "SUCCESS";
-                $return_object->message = "Product " . $product_id . " was deleted from your cart.";
-                $return_object->products_in_cart = $this->getCartItems();
+                return true;
 
             } else {
 
-                $return_object->state = "ERROR";
-                $return_object->message = "product was not found";
-                $return_object->products_in_cart = $this->getCartItems();
+                return false;
 
             }
 
@@ -53,8 +112,9 @@ class Cart{
         }
 
         return json_encode($return_object);
-
     }
+
+
 
     //Tänka sig, ytterligare en funktion...
     //Funktion som hämtar produkterna som ligger i vår varukorg.
@@ -110,7 +170,9 @@ class Cart{
                 $return_object->product = $return;
 
             } else {
+                
                 return false;
+               
             }
 
 
@@ -123,6 +185,7 @@ class Cart{
         return json_encode($return_object);
     }
 
+    //Funktion för att skapa en möjlig checkout
     public function checkout($token_id){
 
         $return_object = new stdClass();
@@ -155,8 +218,12 @@ class Cart{
                             if($return !== false){
                                 $return_object->state = "SUCCESS";
                                 $return_object->message = "Your have successfully checked out!";
+
+
                                 /* LÄGG IN FUNKTION SOM VISAR ALLT FRÅN CHECKOUT_TABELLEN */
                                 /* $return_object->products_in_cart = $this->getCartItems();  */  
+
+
                             } else {
                                 $return_object->state = "ERROR";
                                 $return_object->message = "Could not check out order!";
@@ -182,6 +249,7 @@ class Cart{
 
     }
 
+    //Funktion för att lägga in samtlig användarinfo i checkout db.
     private function insertIntoCheckout($carts_ID_IN){
 
         $query_string = "INSERT INTO checkout(carts_id) VALUES(:cart_id_in)"; 
@@ -198,6 +266,8 @@ class Cart{
 
     }
 
+    //Funktion för att kolla om användaren med tokenen redan har en varukorg
+    //Om inte skapas en ny
     private function validateCart($token_id){
 
         $return_object = new stdClass();
@@ -230,6 +300,7 @@ class Cart{
 
     }
 
+    //Funktion för att skapa ny varukorg
     private function createCart($token_id){
 
         $return_object = new stdClass();
