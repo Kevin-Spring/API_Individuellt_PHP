@@ -197,32 +197,20 @@ class Cart{
 
     }
 
-
     public function createCart($token_id){
 
         $return_object = new stdClass();
 
-        $query_string = "SELECT id FROM tokens WHERE token=:token";
+        $query_string = "INSERT INTO carts2(tokens_id) VALUES(:token_id_in)"; 
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false){
 
-            $statementHandler->bindParam(":token", $token_id);
-            $statementHandler->execute();
-            $token_data =$statementHandler->fetch();
-
-            if($token_data['id'] > 1){
-                
-                $query_string = "INSERT INTO carts2(tokens_id) VALUES(:token_id_in)"; 
-                $statementHandler = $this->database_handler->prepare($query_string);
-
-                $statementHandler->bindParam(":token_id_in", $token_data['id']);
+                $statementHandler->bindParam(":token_id_in", $token_id);
                 $statementHandler->execute();
 
-            } else {
-                $return_object->state = "ERROR";
-                $return_object->message = "Could not insert token id into carts 2 table";
-            }
+                $return_object->state = "SUCCESS";
+
         } else {
             $return_object->state = "ERROR";
             $return_object->message = "Could not create statementhadnler";
@@ -250,6 +238,8 @@ class Cart{
                 $token_data = $statementHandler->fetch();
     
                     if($token_data['id'] > 1){
+
+                        $this->createCart($token_data['id']);
 
                         $query_string = "SELECT id FROM carts2 WHERE tokens_id=:token_id";
                         $statementHandler = $this->database_handler->prepare($query_string);
