@@ -1,0 +1,209 @@
+#container {
+    display: flex;
+    border-radius: 2rem;
+    background: rgba(234, 99, 75, 0.897);
+    
+}
+
+#left {
+    width: 50%;
+    height: 90vh;
+    overflow-y: scroll;
+}
+
+#right {
+    width: 50%;
+}
+
+#right textarea {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    color: #FFFDF7;
+}
+
+h1 {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 8rem;
+    color:#FFFDF7;
+}
+
+h2{
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+button {
+    background: none;
+	border: none;
+    font-size: x-large;
+    color: rgba(255, 197, 187, 0.747);
+    position: relative;
+    left:110%;
+    transform: translateX(-50%) translateY(-90%);
+    padding: 1rem;
+}
+
+button:hover {
+    color: #FFFDF7;
+    cursor: pointer;
+    transition: .3s ease-in-out;
+}
+button:active{
+    transform: translateX(-50%) translateY(-90%);
+    color: rgba(255, 197, 187, 0.747);
+}
+
+.form__container {
+    padding: 5rem;
+}
+
+.form__group {
+    position: relative;
+    display: block;
+    left: 20%;
+    padding: 1rem;
+    width: 50%;
+}
+
+.form__field {
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid rgba(255, 197, 187, 0.747);
+    outline: 0;
+    font-size: 1.3rem;
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+    color: #FFFDF7;
+}
+
+.form__field::placeholder {
+    color: transparent;
+}
+
+.form__field:placeholder-shown ~ .form__label {
+    font-size: 2rem;
+    cursor: text;
+    top: 20px;
+}
+
+
+.form__label {
+    position: absolute;
+    top: -1rem;
+    display: block;
+    transition: 0.2s;
+    font-size: 1.8rem;
+    color: rgba(255, 197, 187, 0.747);
+}
+
+textarea:focus~label, input:focus~label {
+    top: -0.8rem;
+    font-size: 2rem;
+    padding: 0 .3em;
+    color: #FFFDF7;
+}
+
+input[type=radio]{
+    cursor: url(http://files.simey.me/wow-cursor.png), auto;
+    position: relative;
+    left: 50%;
+    top: -1.35rem;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+.form-btn{
+font-size: x-large;
+color: rgba(255, 197, 187, 0.747);
+background: transparent;
+border: none;
+position: relative;
+left:47%;
+transform: translateX(-50%);
+border: 1px solid rgba(255, 197, 187, 0.747);
+padding: 1rem;
+}
+
+.form-btn:hover{
+border: 1px solid #FFFDF7;
+color: #FFFDF7;
+cursor: pointer;
+transition: .3s ease-in-out;
+box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.2), 0 6px 5px 0 rgba(0, 0, 0, 0.19) ;
+}
+.form-btn:active{
+transform: translateX(-50%) translateY(.1rem);
+background: #FFFDF7;
+color: rgba(234, 99, 75, 0.767);
+}
+
+
+  .hr{
+      margin: 3rem;
+      border: 1px solid #FFFDF7;
+  }
+
+  .fa-code{
+    font-size: 2rem;
+    position: relative;
+    left: 2rem;
+    top: 2rem;
+  }
+  .fa-clipboard{
+    font-size: 2rem;
+  }
+
+.fadeInUp {
+    animation: fadeInUp 1s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 100px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.fadeInLeft{
+    animation: fadeInLeft 1s;
+}
+
+@keyframes fadeInLeft {
+    from {
+            opacity: 0;
+            transform: translate3d(100px, 0, 0);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+}
+
+.spinMe{
+    animation: spinMe 1s;
+}
+ @keyframes spinMe{
+     from {
+         transform: rotate(0deg);
+     }
+     to {
+         transform: rotate(360deg);
+     }
+ }
+

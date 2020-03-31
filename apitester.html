@@ -6,28 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>API-tester</title>
-    <style>
-        #container {
-            display: flex;
-        }
-
-        #left {
-            width: 50%;
-            height: 100vh;
-            overflow-y: scroll;
-        }
-
-        #right {
-            width: 50%;
-        }
-
-        #right textarea {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
+
+    function copyText() {
+    var copyText = document.getElementById("token");
+    copyText.select();
+    document.execCommand("copy");
+
+    let spinMe = document.querySelector(".spin");
+    spinMe.classList.add("spinMe");
+
+        setTimeout(function(){
+            spinMe.classList.remove("spinMe");
+        }, 1000)
+    } 
+    
+
         $(document).ready(() => {
             $(".form").on("submit", (e) => {
                 e.preventDefault();
@@ -47,171 +46,399 @@
 </head>
 
 <body>
+
     <div id="container">
 
-        <div id="left">
-                <h2>Registrera användare:</h2>
+        <i class="fas fa-code"></i>
 
-            <form class="form">
-                <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/users/addUser.php" /><br />
-                <input type="text" name="username" placeholder="username" /><br />
-                <input type="password" name="password" placeholder="password" /><br />
-                <input type="email" name="email" placeholder="email" /><br />
-                GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-                    value="post" /><br />
 
-                <input type="submit" />
+        <div id="left" class="form__container">
+            <h1 class="fadeInLeft">API-TEST</h1>
+            <h2 class="fadeInUp">Registrera användare:</h2>
+
+
+            <form class="form fadeInUp">
+                <div class="form__group field">
+                <input type="text" name="url"
+                    value="http://localhost:8080/Individuellt_Kevin_Spring/v1/users/addUser.php" class="form__field"/><br />
+                    <label for="url" class="form__label">Endpoint URL</label> <br>
+                </div>
+                
+                <div class="form__group field">
+                    <input type="text" name="username" placeholder="username" class="form__field" /><br />
+                    <label for="username" class="form__label">Username</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="password" name="password" placeholder="password" class="form__field"/><br />
+                    <label for="password" class="form__label">Password</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="email" name="email" placeholder="email" class="form__field"/><br />
+                    <label for="email" class="form__label">Email</label><br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+                <input type="submit" class="form-btn"/>
             </form>
 
-            <hr />
+
+            <hr class="hr" />
 
             <h2>Logga in användare:</h2>
-
-            <form class="form">
-                <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/users/getUser.php" /><br />
-                <input type="text" name="username" placeholder="username" /><br />
-                <input type="password" name="password" placeholder="password" /><br />
-                GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-                    value="post" /><br />
-                <input type="submit" />
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/users/getUser.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                        </div>
+                        <div class="form__group field">
+                    <input type="text" name="username" placeholder="username" class="form__field" /><br />
+                    <label for="username" class="form__label">Username</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="password" name="password" placeholder="password" class="form__field" /><br />
+                    <label for="password" class="form__label">Password</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+    
+            <input type="submit" class="form-btn"/>
             </form>
 
-        <hr />
 
-        <h2>Lägg till produkt:</h2>
+            <hr class="hr" />
 
-        <form class="form">
-            <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/addProducts.php" /><br />
-            <input type="text" name="token" placeholder="token" /><br />
-            <input type="text" name="title" placeholder="title" /><br />
-            <textarea name="content" placeholder="content"></textarea><br />
-            Select category:
-            <select name="category">
-                <option value="fashion">Fashion</option>
-                <option value="food">Food</option>
-                <option value="lifestyle">Lifestyle</option>
-            </select> <br>
-            <input type="number" name="price" placeholder="price" /><br />
-            GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-                value="post" /><br />
-            <input type="submit" />
-        </form>
+            <h2>Lägg till produkt:</h2>
 
-    <hr />
-
-    <h2>Redigera produkt:</h2>
-
-        <form class="form">
-            <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/editProducts.php" /><br />
-            <input type="text" name="token" placeholder="token" /><br />
-            <input type="number" name="id" placeholder="id"> <br>
-            <input type="text" name="title" placeholder="title" /><br />
-            <textarea name="content" placeholder="content"></textarea><br />
-            <input type="text" name="category" placeholder="category"><br>
-            <input type="number" name="price" placeholder="price"><br>
-            GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-                value="post" /><br />
-            <input type="submit" />
-        </form>
-
-    <hr />
-
-    <h2>Radera produkt:</h2>
-
-        <form class="form">
-            <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/deleteProduct.php" /><br />
-            <input type="text" name="token" placeholder="token" /><br />
-            <input type="number" name="id" placeholder="id"> <br>
-            GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-                value="post" /><br />
-            <input type="submit" />
-        </form>
-
-    <hr />
-
-    <h2>Hämta alla produkter:</h2>
-
-    <form class="form">
-        <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/getAllProducts.php" /><br />
-        <input type="text" name="token" placeholder="token" /><br />
-        Select category:
-            <select name="category">
-                <option value="%%" selected>All</option>
-                <option value="fashion">Fashion</option>
-                <option value="food">Food</option>
-                <option value="lifestyle">Lifestyle</option>
-            </select> <br>
-            DESC: <input type="radio" name="order" value="desc" checked> ASC: <input type="radio" name="order" value="asc"> <br>
-        GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-            value="post" /><br />
-        <input type="submit" />
-    </form>
-
-<hr>
-
-    <h2>Hämta en produkt:</h2>
-
-    <form class="form">
-        <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/getProduct.php" /><br />
-        <input type="text" name="token" placeholder="token" /><br />
-        <input type="number" name="product_id" placeholder = "product id"> <br>
-        GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-            value="post" /><br />
-        <input type="submit" />
-    </form>
-
-<hr>
-
-    <h2>Lägg till produkt i varukorgen:</h2>
-
-    <form class="form">
-        <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/addProductsToCart.php" /><br />
-        <input type="text" name="token" placeholder="token" /><br />
-        <input type="number" name="product_id" placeholder = "product id"> <br>
-        GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-            value="post" /><br />
-        <input type="submit" />
-    </form>
-
-    <hr>
-
-    <h2>Ta bort produkt ur varukorgen:</h2>
-
-    <form class="form">
-        <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/removeProductsFromCart.php" /><br />
-        <input type="text" name="token" placeholder="token" /><br />
-        <input type="number" name="product_id" placeholder = "product id"> <br>
-        GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-            value="post" /><br />
-        <input type="submit" />
-    </form>
-
-    <hr>
-
-    <h2>CHECKOUT:</h2>
-
-    <form class="form">
-        <input type="text" name="url" value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/checkout.php" /><br />
-        <input type="text" name="token" placeholder="token" /><br />
-        <input type="text" name="firstname" placeholder="firstname"><br>
-        <input type="text" name="lastname" placeholder="lastname"><br>
-        <input type="text" name="address" placeholder="address"><br>
-        <input type="email" name="email" placeholder="email@example.com"><br>
-        GET: <input type="radio" name="method" value="get" checked /> POST: <input type="radio" name="method"
-            value="post" /><br />
-        <input type="submit" />
-    </form>
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/addProducts.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                        </div>
+                        <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard spin"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="text" name="title" placeholder="title" class="form__field" /><br />
+                    <label for="title" class="form__label">Title</label> <br>
+                </div>
+                <div class="form__group field">
+                    <textarea name="content" placeholder="content" class="form__field"></textarea><br />
+                    <label for="content" class="form__label">Content</label> <br>
+                </div>
+                <div class="form__group field">
+                    Select category:
+                    <select name="category">
+                        <option value="fashion">Fashion</option>
+                        <option value="food">Food</option>
+                        <option value="lifestyle">Lifestyle</option>
+                    </select> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="price" placeholder="price" class="form__field" /><br />
+                    <label for="price" class="form__label">Price</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+            
+            <input type="submit" class="form-btn"/>
+            </form>
 
 
+            <hr class="hr" />
+
+            <h2>Redigera produkt:</h2>
+
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/editProducts.php" class="form__field" /><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="id" placeholder="id" class="form__field"> <br>
+                    <label for="id" class="form__label">Product id</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="text" name="title" placeholder="title" class="form__field" /><br />
+                    <label for="title" class="form__label">Title</label> <br>
+                </div>
+                <div class="form__group field">
+                    <textarea name="content" placeholder="content" class="form__field"></textarea><br />
+                    <label for="content" class="form__label">Content</label> <br>
+                </div>
+                <div class="form__group field">
+                    Select category:
+                    <select name="category">
+                        <option value="fashion">Fashion</option>
+                        <option value="food">Food</option>
+                        <option value="lifestyle">Lifestyle</option>
+                    </select> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="price" placeholder="price" class="form__field"><br>
+                    <label for="price" class="form__label">Price</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+            <input type="submit" class="form-btn"/>
+            </form>
+
+
+            <hr class="hr" />
+
+            <h2>Radera produkt:</h2>
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/deleteProduct.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="id" placeholder="id" class="form__field"> <br>
+                    <label for="id" class="form__label">Product id</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+            <input type="submit" class="form-btn"/>
+            </form>
+
+            <hr class="hr" />
+
+            <h2>Hämta alla produkter:</h2>
+
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/getAllProducts.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    Select category:
+                    <select name="category">
+                        <option value="%%" selected>All</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="food">Food</option>
+                        <option value="lifestyle">Lifestyle</option>
+                    </select> <br>
+                </div>
+                <div class="form__group field">
+                    DESC:  
+                    <br>
+                    <input type="radio" name="order" value="desc" checked> <br> 
+                    ASC: 
+                    <br>
+                    <input type="radio" name="order"value="asc"> <br>
+                    </div>
+                    <div class="form__group field">
+                        GET: 
+                        <br>
+                        <input type="radio" name="method" value="get" checked />  <br> 
+                        POST: 
+                        <br>
+                        <input type="radio"name="method" value="post" /><br />
+                        </div>
+            <input type="submit" class="form-btn"/>
+            </form>
+
+
+            <hr class="hr">
+
+            <h2>Hämta en produkt:</h2>
+
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/products/getProduct.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="product_id" placeholder="product id" class="form__field"> <br>
+                    <label for="product_id" class="form__label">Product id</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+            <input type="submit" class="form-btn"/>
+            </form>
+
+
+            <hr class="hr">
+
+            <h2>Lägg till produkt i varukorgen:</h2>
+
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/addProductsToCart.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="product_id" placeholder="product id" class="form__field"> <br>
+                    <label for="product_id" class="form__label">Product id</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+           
+            <input type="submit" class="form-btn"/>
+            </form>
+
+
+            <hr class="hr">
+
+            <h2>Ta bort produkt ur varukorgen:</h2>
+
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/removeProductsFromCart.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="number" name="product_id" placeholder="product id" class="form__field"> <br>
+                    <label for="product_id" class="form__label">Product id</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+            <input type="submit" class="form-btn"/>
+            </form>
+
+
+            <hr class="hr">
+
+            <h2>CHECKOUT:</h2>
+
+            
+                <form class="form">
+                    <div class="form__group field">
+                    <input type="text" name="url"
+                        value="http://localhost:8080/Individuellt_Kevin_Spring/v1/carts/checkout.php" class="form__field"/><br />
+                        <label for="url" class="form__label">Endpoint URL</label> <br>
+                    </div>
+                    <div class="form__group field">
+                    <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
+                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="text" name="firstname" placeholder="firstname" class="form__field"><br>
+                    <label for="firstname" class="form__label">Firstname</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="text" name="lastname" placeholder="lastname" class="form__field"><br>
+                    <label for="lastname" class="form__label">Lastname</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="text" name="address" placeholder="address" class="form__field"><br>
+                    <label for="address" class="form__label">Address</label> <br>
+                </div>
+                <div class="form__group field">
+                    <input type="email" name="email" placeholder="email@example.com" class="form__field"><br>
+                    <label for="email" class="form__label">Email</label> <br>
+                </div>
+                <div class="form__group field">
+                    GET: 
+                    <br>
+                    <input type="radio" name="method" value="get" checked />  <br> 
+                    POST: 
+                    <br>
+                    <input type="radio"name="method" value="post" /><br />
+                    </div>
+            
+            <input type="submit" class="form-btn"/>
+            </form>
 
 
 
-</div>
 
 
-    <div id="right">
-        <textarea id="serverResponse"></textarea>
-    </div>
+
+        </div>
+
+
+        <div id="right">
+            <textarea id="serverResponse"></textarea>
+        </div>
     </div>
 
 </body>

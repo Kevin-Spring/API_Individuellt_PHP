@@ -122,7 +122,7 @@ class Cart{
 
         $return_object = new stdClass;
 
-        $query_string = "SELECT id, products_id FROM prodcutsInCarts WHERE carts_id = :cart_id";
+        $query_string = "SELECT id, products_id, price_data FROM prodcutsInCarts WHERE carts_id = :cart_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false) {
@@ -172,9 +172,7 @@ class Cart{
             } else {
                 
                 return false;
-               
             }
-
 
         } else {
             $return_object->state = "ERROR";
@@ -217,7 +215,6 @@ class Cart{
                                 $return_object->state = "SUCCESS";
                                 $return_object->message = "Your have successfully checked out!";
 
-                                /* GET CHECKOUT ITEMS */
                                 $return_object->products_in_cart = $this->getCheckoutItems($carts_data['id']);
 
 
@@ -314,6 +311,7 @@ class Cart{
         return json_encode($return_object);
     }
 
+    //Funktion för att ge kunden en bekräftelse på beställda varor
     private function getCheckoutItems($cart_id){
         $return_object = new stdClass;
 
@@ -435,7 +433,7 @@ class Cart{
                         if($carts_data['id'] > 1){
 
                             //Om vårt fetchade id från token tabellen existerar skickar vi med det tillsammans med produktens id i vår insertCartToDatabase funktion.
-
+                            //Även priset på varorna så totalsumman kan räknas ut i checkouten.
                             $query_string = "SELECT price FROM products WHERE products.id=:product_id";
                             $statementHandler = $this->database_handler->prepare($query_string);
 
@@ -463,7 +461,7 @@ class Cart{
                     } else {
                         //Eftersom vår token raderas i tabellen "tokens" efter en kvart,
                         //Så kommer den även raderas i vår tabell "carts" i och med våra foreign key-relationer.
-                        //Lord praise mysql "CASCADE".
+                        //Man hatar inte mysql:s "CASCADE" setting.
                         $return_object->state = "ERROR";
                         $return_object->message = "Your token has expired!!";
                     }
