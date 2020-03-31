@@ -9,7 +9,10 @@ $user_handler = new User($databaseHandler);
 $cart_handler = new Cart($databaseHandler);
 
 $token_IN = ( isset($_POST['token']) ? $_POST['token'] : '' );
-$cart_id = ( isset($_POST['cart_id']) ? $_POST['cart_id'] : '' );
+$firstname_IN = ( isset($_POST['firstname']) ? $_POST['firstname'] : '' );
+$lastname_IN = ( isset($_POST['lastname']) ? $_POST['lastname'] : '' );
+$address_IN = ( isset($_POST['address']) ? $_POST['address'] : '' );
+$email_IN = ( isset($_POST['email']) ? $_POST['email'] : '' );
 
 if(!empty($token_IN)){
 
@@ -21,7 +24,7 @@ if(!empty($token_IN)){
 
     } else {
 
-        echo $cart_handler->checkout($token_IN);
+        echo $cart_handler->checkout($token_IN, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
         die();
     }
 

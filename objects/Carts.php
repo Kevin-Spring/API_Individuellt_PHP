@@ -185,7 +185,7 @@ class Cart{
     }
 
     //Funktion för att skapa en möjlig checkout
-    public function checkout($token_id){
+    public function checkout($token_id, $firstname, $lastname, $address, $email){
 
         $return_object = new stdClass();
 
@@ -211,8 +211,7 @@ class Cart{
 
                     if($carts_data['id'] > 1){
 
-
-                        $return = $this->insertIntoCheckout($carts_data['id']);
+                        $return = $this->validateCheckout($carts_data['id'], $firstname, $lastname, $address, $email);
 
                             if($return !== false){
                                 $return_object->state = "SUCCESS";
@@ -249,20 +248,55 @@ class Cart{
     }
 
     //Funktion för att lägga in samtlig användarinfo i checkout db.
-    private function insertIntoCheckout($carts_ID_IN){
+    private function insertIntoCheckout($carts_ID_IN, $firstname_IN, $lastname_IN, $address_IN, $email_IN){
 
-        $query_string = "INSERT INTO checkout(carts_id) VALUES(:cart_id_in)"; 
+        $query_string = "INSERT INTO checkout(carts_id, firstname, lastname, address, email) VALUES(:cart_id_in, :firstname_IN, :lastname_IN, :address_IN, :email_IN)"; 
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false){
 
             $statementHandler->bindParam(":cart_id_in", $carts_ID_IN);
+            $statementHandler->bindParam(":firstname_IN", $firstname_IN);
+            $statementHandler->bindParam(":lastname_IN", $lastname_IN);
+            $statementHandler->bindParam(":address_IN", $address_IN);
+            $statementHandler->bindParam(":email_IN", $email_IN);
             $statementHandler->execute();
 
         } else {
             echo "statementhandler fucked up!";
         }
 
+    }
+
+    private function validateCheckout($cart_id,$firstname_IN, $lastname_IN, $address_IN, $email_IN){
+        
+        $return_object = new stdClass();
+
+        $query_string = "SELECT COUNT(id) FROM checkout WHERE carts_id= :cart_id";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+            if($statementHandler !== false ){
+
+                $statementHandler->bindParam(":cart_id", $cart_id);
+                $statementHandler->execute();
+
+                $numberOfCarts = $statementHandler->fetch()[0];
+
+                if($numberOfCarts < 1) {
+
+                    $this->insertIntoCheckout($cart_id, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
+                    $return_object->state = "SUCCESS!";
+                    $return_object->message = "Created cart for user";
+
+            } else {
+
+                $return_object->message = "User already have an active cart";
+
+            }
+
+        }
+
+        return json_encode($return_object);
     }
 
     //Funktion för att kolla om användaren med tokenen redan har en varukorg
@@ -420,6 +454,8 @@ class Cart{
         }
 
     }
+
+    
 
 }
 
