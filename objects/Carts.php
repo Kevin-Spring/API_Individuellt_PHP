@@ -249,21 +249,36 @@ class Cart{
     //Funktion för att lägga in samtlig användarinfo i checkout db.
     private function insertIntoCheckout($carts_ID_IN, $firstname_IN, $lastname_IN, $address_IN, $email_IN){
 
-        $query_string = "INSERT INTO checkout(carts_id, firstname, lastname, address, email) VALUES(:cart_id_in, :firstname_IN, :lastname_IN, :address_IN, :email_IN)"; 
+        $query_string = "SELECT SUM(price_data) FROM prodcutsInCarts WHERE carts_id = :cart_id";
+
         $statementHandler = $this->database_handler->prepare($query_string);
 
-        if($statementHandler !== false){
+        $statementHandler->bindParam(":cart_id", $carts_ID_IN);
+        $statementHandler->execute();
 
-            $statementHandler->bindParam(":cart_id_in", $carts_ID_IN);
-            $statementHandler->bindParam(":firstname_IN", $firstname_IN);
-            $statementHandler->bindParam(":lastname_IN", $lastname_IN);
-            $statementHandler->bindParam(":address_IN", $address_IN);
-            $statementHandler->bindParam(":email_IN", $email_IN);
-            $statementHandler->execute();
+        $total_price = $statementHandler->fetch();
 
-        } else {
-            echo "statementhandler fucked up!";
+        if($total_price["SUM(price_data)"] > 0){
+
+            $query_string = "INSERT INTO checkout(carts_id, firstname, lastname, address, email, total_price) VALUES(:cart_id_in, :firstname_IN, :lastname_IN, :address_IN, :email_IN, :total_price_IN)"; 
+            $statementHandler = $this->database_handler->prepare($query_string);
+
+            if($statementHandler !== false){
+
+                $statementHandler->bindParam(":cart_id_in", $carts_ID_IN);
+                $statementHandler->bindParam(":firstname_IN", $firstname_IN);
+                $statementHandler->bindParam(":lastname_IN", $lastname_IN);
+                $statementHandler->bindParam(":address_IN", $address_IN);
+                $statementHandler->bindParam(":email_IN", $email_IN);
+                $statementHandler->bindParam(":total_price_IN", $total_price["SUM(price_data)"]);
+                $statementHandler->execute();
+
+            } else {
+                echo "statementhandler fucked up!";
+            }
+
         }
+
 
     }
 
@@ -302,7 +317,7 @@ class Cart{
     private function getCheckoutItems($cart_id){
         $return_object = new stdClass;
 
-        $query_string = "SELECT carts_id, firstname, lastname, address, email FROM checkout WHERE carts_id = :cart_id";
+        $query_string = "SELECT carts_id, firstname, lastname, address, email, total_price FROM checkout WHERE carts_id = :cart_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false){
@@ -420,7 +435,16 @@ class Cart{
                         if($carts_data['id'] > 1){
 
                             //Om vårt fetchade id från token tabellen existerar skickar vi med det tillsammans med produktens id i vår insertCartToDatabase funktion.
-                            $return = $this->insertNewCartToDatabase($product_id, $carts_data['id']);
+
+                            $query_string = "SELECT price FROM products WHERE products.id=:product_id";
+                            $statementHandler = $this->database_handler->prepare($query_string);
+
+                            $statementHandler->bindParam(":product_id", $product_id);
+                            $statementHandler->execute();
+
+                            $price_data = $statementHandler->fetch();
+
+                            $return = $this->insertNewCartToDatabase($product_id, $carts_data['id'], $price_data['price']);
 
                             if($return !== false){
                                 $return_object->state = "SUCCESS";
@@ -455,29 +479,18 @@ class Cart{
     }
 
     //Vår funktion för att faktiskt lägga in produkten och användarens token i databasen.
-    private function insertNewCartToDatabase($product_ID_IN, $carts_ID_IN){
+    private function insertNewCartToDatabase($product_ID_IN, $carts_ID_IN, $price_data){
 
-    $query_string = "INSERT INTO prodcutsInCarts(products_id, carts_id) VALUES(:productID, :cartID)";
+    $query_string = "INSERT INTO prodcutsInCarts(products_id, carts_id, price_data) VALUES(:productID, :cartID, :price_data)";
     $statementHandler = $this->database_handler->prepare($query_string);
 
     if($statementHandler !== false){
 
         $statementHandler->bindParam(":productID", $product_ID_IN);
         $statementHandler->bindParam(":cartID", $carts_ID_IN);
+        $statementHandler->bindParam(":price_data", $price_data);
 
         $statementHandler->execute();
-
-        //För att kunna hämta json-objektet behöver vi hämta informationen vi precis la in i databasen.
-        $last_inserted_product_id = $this->database_handler->lastInsertId();
-
-        $query_string = "SELECT id, products_id, carts_id FROM prodcutsInCarts WHERE id=:last_user_id";
-        $statementHandler = $this->database_handler->prepare($query_string);
-
-        $statementHandler->bindParam(':last_user_id', $last_inserted_product_id);
-
-        $statementHandler->execute();
-
-        return $statementHandler->fetch();
 
         } else {
             return false;
