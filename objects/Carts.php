@@ -217,9 +217,8 @@ class Cart{
                                 $return_object->state = "SUCCESS";
                                 $return_object->message = "Your have successfully checked out!";
 
-
-                                /* LÄGG IN FUNKTION SOM VISAR ALLT FRÅN CHECKOUT_TABELLEN */
-                                /* $return_object->products_in_cart = $this->getCartItems();  */  
+                                /* GET CHECKOUT ITEMS */
+                                $return_object->products_in_cart = $this->getCheckoutItems($carts_data['id']);
 
 
                             } else {
@@ -268,6 +267,7 @@ class Cart{
 
     }
 
+    //Funktion som stoppar användaren ifrån att skapa flera checkouts med samma id.
     private function validateCheckout($cart_id,$firstname_IN, $lastname_IN, $address_IN, $email_IN){
         
         $return_object = new stdClass();
@@ -294,6 +294,36 @@ class Cart{
 
             }
 
+        }
+
+        return json_encode($return_object);
+    }
+
+    private function getCheckoutItems($cart_id){
+        $return_object = new stdClass;
+
+        $query_string = "SELECT carts_id, firstname, lastname, address, email FROM checkout WHERE carts_id = :cart_id";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false){
+
+            $statementHandler->bindParam(":cart_id", $cart_id);
+            $statementHandler->execute();
+
+            $return = $statementHandler->fetch();
+
+            if(!empty($return)){
+
+                $return_object->state = "SUCCESS";
+                $return_object->product = $return;
+
+            } else {
+                return false;
+            }
+
+
+        } else {
+            return false;
         }
 
         return json_encode($return_object);
