@@ -1,18 +1,59 @@
+*, *::before, *::after{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/*effect-box*/
+.effect-box:after,
+.effect-box:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  height: 1em;
+  width: 100%;
+  margin-top: 10px;
+  opacity: 0;
+  -webkit-transition: opacity 0.35s, -webkit-transform 0.35s;
+  transition: opacity 0.35s, transform 0.35s;
+	
+}
+
+.effect-box:before {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  -webkit-transform: scale(1,0);
+  transform: scale(1,0);
+}
+
+.effect-box:after {
+  border-bottom: 1px solid;
+  border-top: 1px solid;
+  -webkit-transform: scale(0,1);
+  transform: scale(0,1);
+}
+
+.effect-box:hover::after,
+.effect-box:hover::before {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+
 #container {
     display: flex;
-    border-radius: 2rem;
     background: rgba(234, 99, 75, 0.897);
-    
 }
 
 #left {
     width: 50%;
-    height: 90vh;
+    height: 100vh;
     overflow-y: scroll;
 }
 
 #right {
     width: 50%;
+    overflow: hidden;
 }
 
 #right textarea {
@@ -26,6 +67,7 @@ body {
 }
 
 h1 {
+    position: relative;
     margin-top: 1rem;
     text-align: center;
     font-size: 8rem;
@@ -43,9 +85,9 @@ button {
 	border: none;
     font-size: x-large;
     color: rgba(255, 197, 187, 0.747);
-    position: relative;
+    position: absolute;
     left:23rem;
-    top: -2.5rem;
+   margin-top: -3rem;
 }
 
 button:hover {
@@ -56,7 +98,10 @@ button:hover {
 button:active{
     color: rgba(255, 197, 187, 0.747);
 }
-
+textarea{
+    resize: none;
+    height: 5rem;
+}
 .form__container {
     padding: 5rem;
 }
@@ -147,21 +192,20 @@ background: #FFFDF7;
 color: rgba(234, 99, 75, 0.767);
 }
 
+.hr{
+    margin: 3rem;
+    border: .1px solid #FFFDF7;
+}
 
-  .hr{
-      margin: 3rem;
-      border: 1px solid #FFFDF7;
-  }
-
-  .fa-code{
+.fa-code{
     font-size: 2rem;
     position: relative;
     left: 2rem;
     top: 2rem;
-  }
-  .fa-clipboard{
+}
+.fa-clipboard{
     font-size: 2rem;
-  }
+}
 
 .fadeInUp {
     animation: fadeInUp 1s;
