@@ -12,21 +12,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
-
-    function copyText() {
-    var copyText = document.getElementById("token");
-    copyText.select();
-    document.execCommand("copy");
-
-    let spinMe = document.querySelector(".spin");
-    spinMe.classList.add("spinMe");
-
-        setTimeout(function(){
-            spinMe.classList.remove("spinMe");
-        }, 1000)
-    } 
-    
-
         $(document).ready(() => {
             $(".form").on("submit", (e) => {
                 e.preventDefault();
@@ -46,10 +31,12 @@
 </head>
 
 <body>
+   
 
     <div id="container">
 
         <i class="fas fa-code"></i>
+        
 
 
         <div id="left" class="form__container">
@@ -132,7 +119,7 @@
                         </div>
                         <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard spin"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="text" name="title" placeholder="title" class="form__field" /><br />
@@ -180,7 +167,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="number" name="id" placeholder="id" class="form__field"> <br>
@@ -230,7 +217,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="number" name="id" placeholder="id" class="form__field"> <br>
@@ -260,7 +247,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     Select category:
@@ -304,7 +291,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="number" name="product_id" placeholder="product id" class="form__field"> <br>
@@ -335,7 +322,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="number" name="product_id" placeholder="product id" class="form__field"> <br>
@@ -367,7 +354,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="number" name="product_id" placeholder="product id" class="form__field"> <br>
@@ -398,7 +385,7 @@
                     </div>
                     <div class="form__group field">
                     <input type="text" name="token" placeholder="token" class="form__field" id="token" /><br />
-                    <label for="token" class="form__label">Token</label><button onclick="copyText()"><i class="far fa-clipboard"></i></button> <br>
+                    <label for="token" class="form__label">Token</label><button class="copy-btn"><i class="far fa-clipboard"></i></button> <br>
                 </div>
                 <div class="form__group field">
                     <input type="text" name="firstname" placeholder="firstname" class="form__field"><br>
@@ -440,6 +427,36 @@
             <textarea id="serverResponse"></textarea>
         </div>
     </div>
+
+    <script>
+        
+        
+        let buttons = document.querySelectorAll(".copy-btn");
+        let copyText = document.querySelectorAll("#token");
+
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function() {
+
+                
+                copyText[i].select();
+                document.execCommand("copy");
+            
+                buttons[i].classList.add('spinMe');
+
+                setTimeout(function(){
+                        buttons[i].classList.remove("spinMe");
+                    }, 2000)
+            
+            })
+
+            
+        }
+
+        
+
+        
+
+    </script>
 
 </body>
 

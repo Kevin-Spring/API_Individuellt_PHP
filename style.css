@@ -44,9 +44,8 @@ button {
     font-size: x-large;
     color: rgba(255, 197, 187, 0.747);
     position: relative;
-    left:110%;
-    transform: translateX(-50%) translateY(-90%);
-    padding: 1rem;
+    left:23rem;
+    top: -2.5rem;
 }
 
 button:hover {
@@ -55,7 +54,6 @@ button:hover {
     transition: .3s ease-in-out;
 }
 button:active{
-    transform: translateX(-50%) translateY(-90%);
     color: rgba(255, 197, 187, 0.747);
 }
 
