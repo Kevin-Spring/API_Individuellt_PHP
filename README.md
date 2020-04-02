@@ -71,5 +71,13 @@
 ## v1/carts/checkout.php
     1. Användare ska kunna klicka på en knapp och få bekräftelse på sina produkter från varukorgen.
      
+# Naming convention:
 
+## Variabler: underscore, "$jag_är_en_variabel".
+
+## Funktioner: camelCase, "jagÄrEnFunktion". 
+
+## $_POST: Försök binda med variabelnamn och one-line if-satser.
+
+## bindParam på alla SQL-frågor.
 

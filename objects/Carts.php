@@ -183,8 +183,8 @@ class Cart{
     }
 
     //Funktion för att skapa en möjlig checkout
-    //Nu försvinner tyvärr allt som läggs in i checkout pga tokens expire tid.
-    //Kolla in det.
+    //Nu försvinner tyvärr allt som läggs in i checkout efter 15 min pga tokens expire tid.
+    //I framtiden behövs en lösning för att kunna spara checkouten.
     public function checkout($token_id, $firstname, $lastname, $address, $email){
 
         $return_object = new stdClass();
