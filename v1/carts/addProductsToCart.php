@@ -21,6 +21,9 @@ if(!empty($token_IN)){
             
             $retObject->error = "Token is invalid";
 
+
+           /*  Metod för att ta bort kundvagn som inte utcheckad */
+
         } else {
 
             echo $cart_handler->addToNewCart($productID, $token_IN);

@@ -183,8 +183,21 @@ class Cart{
     }
 
     //Funktion för att skapa en möjlig checkout
-    //Nu försvinner tyvärr allt som läggs in i checkout efter 15 min pga tokens expire tid.
-    //I framtiden behövs en lösning för att kunna spara checkouten.
+    //Nu försvinner tyvärr allt som läggs in i checkout efter 15 min pga tokens expire tid, för vår cart raderas.
+    //I v2 behövs en lösning för att kunna spara checkouten.
+
+    /* ------ POTENTIELL LÖSNING -------- */
+    
+    //Om en token inte raderas ur token tabellen vid inaktivitet, utan bara uppdaterar token-värdet varje gång man loggar in.
+    //Så kommer inte cartsen försvinna, med andra ord kommer inte checkouten försvinna.
+    //Då får en inloggad user alltid samma token id, men det är nytt värde i den varje gång något slår mot databasen.
+    //För att då radera en cart vid inaktivitet och spara carts som har blivit utcheckade kan vi lägga in ytterligare en kolumn i tabellen carts. 
+    //Nya tabellen med namnet t.ex. ”status” kommer vara beroende av värdet i den kolumnen och våra sql-frågor kommer då radera de som är inaktiva och- 
+    //spara de som har ”status = utcheckad” exempelvis.
+    //Då får alla nyskapade carts ha ett DEFAULT-VÄRDE i status-kolumnen som indikerar att de inte checkats ut.
+    //Och när vi checkar ut får cartsens ”status-värden” då bli ändrade.
+    //Då kommer vi kunna se vilka våra utcheckade carts är i checkouten.
+
     public function checkout($token_id, $firstname, $lastname, $address, $email){
 
         $return_object = new stdClass();

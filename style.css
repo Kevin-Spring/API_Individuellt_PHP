@@ -64,9 +64,9 @@ body {
 h1 {
     position: relative;
     text-align: center;
-    font-size: 8rem;
+    font-size: 6rem;
     color:#FFFDF7;
-    top: -7.4rem;
+    top: -6.5rem;
 }
 
 h2{
@@ -95,6 +95,7 @@ button:hover {
 button:active{
     color: rgba(255, 197, 187, 0.747);
 }
+
 textarea{
     resize: none;
     height: 5rem;
@@ -181,17 +182,20 @@ border: 1px solid #FFFDF7;
 color: #FFFDF7;
 cursor: pointer;
 transition: .3s ease-in-out;
-box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.2), 0 6px 5px 0 rgba(0, 0, 0, 0.19) ;
+box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2), 0 6px 5px 0 rgba(0, 0, 0, 0.075) ;
 }
 .form-btn:active{
 transform: translateX(-50%) translateY(.1rem);
 background: #FFFDF7;
 color: rgba(234, 99, 75, 0.767);
 }
-
+.form-btn:focus{
+    outline: 0;
+    border: 2px solid #FFFDF7;
+}
 .hr{
     margin: 3rem;
-    border: .1px solid #FFFDF7;
+    border: .5px solid #FFFDF7;
 }
 
 .fa-code{
