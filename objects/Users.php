@@ -324,7 +324,6 @@ class User{
         } else {
             $return_object->state = "ERROR";
             $return_object->message = "Could not create STATEMENTHANDLER in validateToken!";
-            die;
         }  
 
         return json_encode($return_object);
@@ -342,6 +341,76 @@ class User{
         $statementHandler->bindParam(":token", $token_ID);
 
         $statementHandler->execute();
+
+        }
+
+        private function getUserId($token){
+            $return_object = new stdClass;
+
+            $query_string = "SELECT user_id FROM tokens WHERE token = :token";
+            $statementHandler = $this->database_handler->prepare($query_string);
+
+
+            if($statementHandler !== false){
+
+                $statementHandler->bindParam(":token", $token);
+                $statementHandler->execute();
+
+                $return = $statementHandler->fetch()[0];
+
+                if(!empty($return)){
+                    return $return;
+                } else {
+                    return -1;
+                }
+
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not create STATEMENTHANDLER in getUserId!";
+                
+            }
+            return json_encode($return_object);
+        }
+
+        private function getUserData($user_id) {
+            $return_object = new stdClass;
+
+            $query_string = "SELECT id, username, email, role FROM users WHERE id = :user_id";
+
+            $statementHandler = $this->database_handler->prepare($query_string);
+
+            if($statementHandler !== false){
+
+                $statementHandler->bindParam(":user_id", $user_id);
+                $statementHandler->execute();
+
+                $return = $statementHandler->fetch();
+
+                if(!empty($return)){
+                    return $return;
+                } else {
+                    return false;
+                }
+
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not create STATEMENTHANDLER in getUserData!";
+            }
+
+            return json_encode($return_object);
+
+        }
+
+        public function isAdmin($token) {
+
+            $user_id = $this->getUserId($token);
+            $user_data = $this->getUserData($user_id);
+
+            if($user_data['role'] == 1){
+                return true;
+            } else {
+                return false;
+            }
 
         }
     

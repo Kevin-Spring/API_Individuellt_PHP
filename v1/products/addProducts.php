@@ -1,7 +1,10 @@
 <?php
 
 include("../../objects/Products.php");
+include("../../objects/Users.php");
+
 $product_handler = new Product($databaseHandler);
+$user_handler =    new User($databaseHandler);
 
 $title_IN = ( isset($_POST['title']) ? $_POST['title'] : '' );
 $content_IN = ( isset($_POST['content']) ? $_POST['content'] : '' );
@@ -10,9 +13,19 @@ $price_IN = ( isset($_POST['price']) ? $_POST['price'] : '' );
 $token_IN = ( isset($_POST['token']) ? $_POST['token'] : '' );
 
 if(!empty($token_IN)){
-
     $retObject = new stdClass();
 
+    if($user_handler->validateToken($token_IN) === false) {
+        $retObject->error = "Invalid token!";
+    }
+
+    $is_admin = $user_handler->isAdmin($token_IN);
+ 
+    if($is_admin === false) {
+        echo "You are not admin!";
+        die();
+    }
+    
     if(!empty($title_IN)) {
 
         if(!empty($content_IN)) {
