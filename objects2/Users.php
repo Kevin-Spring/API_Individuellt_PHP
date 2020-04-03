@@ -215,16 +215,17 @@ class User{
 
                         if(($diff / 60) > $this->token_validity_time) {
 
-                            //Om en token inte raderas ur token tabellen vid inaktivitet, utan bara uppdaterar tokens timestamp-värde varje gång man loggar in.
+                            //Om en token inte raderas ur token tabellen vid inaktivitet, utan bara uppdaterar tokens värden varje gång man loggar in.
                             //Så kommer inte cartsen försvinna, med andra ord kommer inte checkouten försvinna.
-                            //Då får en inloggad user alltid samma token id och token, men det är nytt timestamp-värde i den varje gång något slår mot databasen.
+                            //Då får en inloggad user alltid samma token id, men det är nytt token-värde i den varje gång något slår mot databasen.
                             //För att då radera en cart vid inaktivitet och spara carts som har blivit utcheckade kan vi lägga in ytterligare en kolumn i tabellen carts.
                             //Nya tabellen med namnet t.ex. ”status” kommer vara beroende av värdet i den kolumnen och våra sql-frågor kommer då radera de som är inaktiva och spara de som har ”status = utcheckad” exempelvis.
                             //Då får alla nyskapade carts ha ett DEFAULT-VÄRDE i status-kolumnen som indikerar att de inte checkats ut.
                             //Och när vi checkar ut får cartsens ”status-värden” då bli ändrade.
                             //Då kommer vi kunna se vilka våra utcheckade carts är i checkouten.
 
-                            //Därför testar vi nu att ENBART uppdatera tokens oavsett inaktivitet eller aktivitet.
+                            //Därför testar vi nu att ENBART uppdatera tokens oavsett inaktivitet eller aktivitet. Inte radera någonting.
+                            //Till skillnad från v1.
 
                             /* $query_string = "DELETE FROM tokens WHERE user_id=:userID";
                             $statementHandler = $this->database_handler->prepare($query_string);
@@ -236,16 +237,15 @@ class User{
                             $return_object->token = $this->createToken($userID_IN); */
 
                             $return_object->state = "SUCCESS";
-                            $return_object->token = $return['token'];
-                            $this->updateStatus($return['token']);
+                            $return_object->token = $this->updateToken($return['token']);
 
                         } else {
                             $return_object->state = "SUCCESS";
                             $return_object->token = $return['token'];
+
                         }
 
                     } else {
-
                         $return_object->state = "SUCCESS";
                         $return_object->token = $this->createToken($userID_IN);
                     }
@@ -305,7 +305,7 @@ class User{
 
         $return_object = new stdClass;
 
-        $query_string = "SELECT user_id, date_updated FROM tokens WHERE token=:token";
+        $query_string = "SELECT user_id, date_updated, token FROM tokens WHERE token = :token";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false ){
@@ -315,7 +315,13 @@ class User{
 
             $token_data = $statementHandler->fetch();
 
-            if(!empty($token_data['date_updated'])){
+            if(empty($token_data['token'])){
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not match your token with db!";
+                return false;
+            }
+           
+            if($token == $token_data['token']){
 
                 /* Räkna ut hur lång tid det har gått sen du fick din token, även sen 70-talet */
                 $diff = time() - $token_data['date_updated'];
@@ -323,8 +329,8 @@ class User{
                 if(($diff / 60) < $this->token_validity_time){
 
                     // Uppdaterar token om användare är aktiv
-                    $return_object->state = "SUCCESS";
                     $return_object->token = $this->updateStatus($token);
+                    
 
                 } else {
                     $return_object->state = "ERROR";
@@ -332,8 +338,11 @@ class User{
                 }
 
             } else {
+                
+                //Här måste jag returnera false för att endpointen getallproducts ska lira.
                 $return_object->state = "ERROR";
-                $return_object->message = "Could not find token, please log in first";
+                $return_object->message = "Could not match your token with db!";
+                
             }
 
         } else {
@@ -345,19 +354,38 @@ class User{
 
     }
 
+    //Funktion för att ge användaren ny token vid inaktivitet.
+    private function updateToken($token_ID){
+
+        $query_string = "UPDATE tokens SET token = :new_token WHERE token = :token";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false ){
+            $new_token = md5($this->username.uniqid('', true).time());
+
+            $statementHandler->bindParam(":new_token", $new_token);
+            $statementHandler->bindParam(":token", $token_ID);
+
+            $statementHandler->execute();
+        }
+
+    }
+
     // Uppdaterar token om användare är aktiv
      private function updateStatus($token_ID){
 
         $query_string = "UPDATE tokens SET date_updated = :date_updated_new WHERE token = :token";
         $statementHandler = $this->database_handler->prepare($query_string);
-        
-        $new_current_time = time();
-        $statementHandler->bindParam(":date_updated_new", $new_current_time);
-        $statementHandler->bindParam(":token", $token_ID);
 
-        $statementHandler->execute();
+        if($statementHandler !== false ){
+            $new_current_time = time();
+            $statementHandler->bindParam(":date_updated_new", $new_current_time);
+            $statementHandler->bindParam(":token", $token_ID);
 
+            $statementHandler->execute();
         }
+        
+    }
 
         private function getUserId($token){
             $return_object = new stdClass;

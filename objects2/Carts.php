@@ -11,7 +11,6 @@ class Cart{
 
     }
 
-
     //Funktion för att kunna ta bort enskilda produkter ur varukorgen
     public function removeFromCart($product_id, $token_id){
 
@@ -20,28 +19,27 @@ class Cart{
         $check_token = $this->getTokenId($token_id);
         $check_cart = $this->getCartId($check_token);
 
-                $carts_data = $check_cart['id'];
+        $carts_data = $check_cart['id'];
 
-                    if(!empty($carts_data)){
+        if(!empty($carts_data)){
 
-                        //Om vårt fetchade id från token tabellen existerar skickar vi med det tillsammans med produktens id med vår removeFromCartDb funktion.
-                        $return = $this->removeFromCartDb($product_id);
+            //Om vårt fetchade id från token tabellen existerar skickar vi med det tillsammans med produktens id med vår removeFromCartDb funktion.
+            $return = $this->removeFromCartDb($product_id);
 
-                            if($return !== false){
-                                $return_object->state = "SUCCESS";
-                                $return_object->message = "Product " . $product_id . " was removed from your shoppingcart";
-                                $return_object->products_in_cart = $this->getCartItems($carts_data);   
-                            } else {
-                                $return_object->state = "ERROR";
-                                $return_object->message = "Could not find that specific product!";
-                                $return_object->products_in_cart = $this->getCartItems($carts_data);  
-                            }
+            if($return !== false){
+                $return_object->state = "SUCCESS";
+                $return_object->message = "Product " . $product_id . " was removed from your shoppingcart";
+                $return_object->products_in_cart = $this->getCartItems($carts_data);   
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not find that specific product!";
+                $return_object->products_in_cart = $this->getCartItems($carts_data);  
+            }
 
-                    } else {
-                            $return_object->state = "ERROR";
-                            $return_object->message = "Please create a shoppingcart!";
-                        }
-
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "Please create a shoppingcart!";
+        }
 
         return json_encode($return_object);
 
@@ -157,10 +155,10 @@ class Cart{
 
     /* ------ POTENTIELL LÖSNING -------- */
     
-    //Om en token inte raderas ur token tabellen vid inaktivitet, utan bara uppdaterar tokens timestamp-värde varje gång man loggar in.
+    //Om en token inte raderas ur token tabellen vid inaktivitet, utan bara uppdaterar tokens värden varje gång man loggar in.
     //Så kommer inte cartsen försvinna, med andra ord kommer inte checkouten försvinna.
-    //Då får en inloggad user alltid samma token id och token, men det är nytt värde i den varje gång något slår mot databasen.
-    //För att då radera en cart vid inaktivitet och spara carts som har blivit utcheckade kan vi lägga in ytterligare en kolumn i tabellen carts. 
+    //Då får en inloggad user alltid samma token id, men det är nytt token-värde i den varje gång något slår mot databasen.
+    //För att då radera en cart vid inaktivitet och spara carts som har blivit utcheckade kan vi lägga in ytterligare en kolumn i tabellen carts.
     //Nya tabellen med namnet t.ex. ”status” kommer vara beroende av värdet i den kolumnen och våra sql-frågor kommer då radera de som är inaktiva och spara de som har ”status = utcheckad” exempelvis.
     //Då får alla nyskapade carts ha ett DEFAULT-VÄRDE i status-kolumnen som indikerar att de inte checkats ut.
     //Och när vi checkar ut får cartsens ”status-värden” då bli ändrade.
@@ -174,26 +172,26 @@ class Cart{
         $check_token = $this->getTokenId($token_id);
         $check_cart = $this->getCartId($check_token);
 
-                $carts_data = $check_cart['id'];
+        $carts_data = $check_cart['id'];
 
-                    if(!empty($carts_data)){
+        if(!empty($carts_data)){
 
-                        $return = $this->validateCheckout($carts_data, $firstname, $lastname, $address, $email);
+            $return = $this->validateCheckout($carts_data, $firstname, $lastname, $address, $email);
 
-                            if($return !== false){
-                                $return_object->state = "SUCCESS";
-                                $return_object->message = "Your have successfully checked out!";
-                                $return_object->products_in_cart = $this->getCheckoutItems($carts_data);
+            if($return !== false){
+                $return_object->state = "SUCCESS";
+                $return_object->message = "Your have successfully checked out!";
+                $return_object->products_in_cart = $this->getCheckoutItems($carts_data);
 
-                            } else {
-                                $return_object->state = "ERROR";
-                                $return_object->message = "Could not check out order!";
-                            }
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Could not check out order!";
+            }
 
-                    } else {
-                        $return_object->state = "ERROR";
-                        $return_object->message = "Please create a shoppingcart!";
-                    }
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "Please create a shoppingcart!";
+        }
 
         return json_encode($return_object);
 
@@ -264,16 +262,16 @@ class Cart{
 
             if($statementHandler !== false ){
 
-                $statementHandler->bindParam(":cart_id", $cart_id);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":cart_id", $cart_id);
+            $statementHandler->execute();
 
-                $numberOfCarts = $statementHandler->fetch()[0];
+            $numberOfCarts = $statementHandler->fetch()[0];
 
-                if($numberOfCarts < 1) {
+            if($numberOfCarts < 1) {
 
-                    $this->insertIntoCheckout($cart_id, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
-                    $return_object->state = "SUCCESS!";
-                    $return_object->message = "Created cart for user";
+                $this->insertIntoCheckout($cart_id, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
+                $return_object->state = "SUCCESS!";
+                $return_object->message = "Created cart for user";
 
             } else {
 
@@ -323,37 +321,41 @@ class Cart{
 
         $return_object = new stdClass();
 
-        $query_string = "SELECT COUNT(id), status FROM carts2 WHERE tokens_id= :token_id";
+        $query_string = "SELECT id, status FROM carts2 WHERE tokens_id= :token_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false ){
+        if($statementHandler !== false ){
 
-                $statementHandler->bindParam(":token_id", $token_id);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":token_id", $token_id);
+            $statementHandler->execute();
 
-                $cart_data = $statementHandler->fetch();
+            $cart_data = $statementHandler->fetch();
 
-                if($cart_data['COUNT(id)'] < 1) {
+            if(empty($cart_data['id'])) {
 
-                    $this->createCart($token_id);
-                    $return_object->state = "SUCCESS!";
-                    $return_object->message = "Created cart for user";
+                $this->createCart($token_id);
+                $return_object->state = "SUCCESS!";
+                $return_object->message = "Created cart for user";
 
-                } else {
+            } else {
 
-                    if($cart_data['status'] == 1){
+                if($cart_data['status'] == 1){
 
-                    /* --------- ANVÄNDARE KAN BARA HANDLA EN GÅNG FÖRTILLFÄLLET --------- */
+                /* --------- ANVÄNDARE KAN BARA HANDLA EN GÅNG FÖRTILLFÄLLET --------- */
 
-                        //$this->createCart($token_id);
+                    /* $this->createCart($token_id);
+                    
+
+                    if($cart_data['status'] == "NULL" && $cart_data['COUNT(id)'] > 2){
                         echo "User has already made his purchase";
                         die();
+                    } */
     
-                    } 
+                } 
 
-                    $return_object->message = "User already have an active cart";
+                $return_object->message = "User already have an active cart";
 
-                }
+            }
         }
 
         return json_encode($return_object);
@@ -368,19 +370,18 @@ class Cart{
         $query_string = "INSERT INTO carts2(tokens_id) VALUES(:token_id_in)"; 
         $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false){
-                $currentTime = time();
+        if($statementHandler !== false){
 
-                $statementHandler->bindParam(":token_id_in", $token_id);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":token_id_in", $token_id);
+            $statementHandler->execute();
         
-                $return_object->state = "SUCCESS";
-                $return_object->message = "Created a cart for user.";
+            $return_object->state = "SUCCESS";
+            $return_object->message = "Created a cart for user.";
         
-            } else {
-                $return_object->state = "ERROR";
-                $return_object->message = "Could not create statementhadnler";
-                }        
+        } else {
+            $return_object->state = "ERROR";
+            $return_object->message = "Could not create statementhadnler";
+        }        
 
         return json_encode($return_object);
 
@@ -401,22 +402,23 @@ class Cart{
 
                 if(!empty($check_cart)){
 
-                            $product_data = $this->getProductData($product_id);
+                    $product_data = $this->getProductData($product_id);
 
-                            if(!empty($product_data['id'])){
+                    if(!empty($product_data['id'])){
 
-                                $return = $this->insertNewCartToDatabase($product_id, $check_cart['id'], $product_data['price']);
+                        $return = $this->insertNewCartToDatabase($product_id, $check_cart['id'], $product_data['price']);
 
-                                if($return !==false){ 
-                                    $return_object->state = "SUCCESS";
-                                    $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
-                                    $return_object->products_in_cart = $this->getCartItems($check_cart['id']);
-                                }
+                        if($return !==false){ 
+                            $return_object->state = "SUCCESS";
+                            $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
+                            $return_object->products_in_cart = $this->getCartItems($check_cart['id']);
+                        }
 
-                            } else {
-                                $return_object->state = "ERROR";
-                                $return_object->message = "Could not find that specific product!";
-                            }
+                    } else {
+                        $return_object->state = "ERROR";
+                        $return_object->message = "Could not find that specific product!";
+                    }
+
                 } else {
                     $return_object->state = "ERROR";
                     $return_object->message = "Please create a shoppingcart!";
@@ -429,7 +431,7 @@ class Cart{
                       
             return json_encode($return_object);
     
-            } 
+        } 
 
     //Vår funktion för att faktiskt lägga in produkten och användarens token i databasen.
     private function insertNewCartToDatabase($product_ID_IN, $carts_ID_IN, $price_data){
@@ -487,19 +489,19 @@ class Cart{
         $query_string = "SELECT id FROM tokens WHERE token=:token";
         $statementHandler = $this->database_handler->prepare($query_string);
     
-            if($statementHandler !== false ){
+        if($statementHandler !== false ){
     
-                $statementHandler->bindParam(":token", $token_id_check);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":token", $token_id_check);
+            $statementHandler->execute();
     
-                $token_data = $statementHandler->fetch();
+            $token_data = $statementHandler->fetch();
     
-                    if(!empty($token_data)){
-                        return $token_data;
-                    } else {
-                        return false;
-                    }
+            if(!empty($token_data)){
+                return $token_data;
+            } else {
+                return false;
             }
+        }
     }
     
     //Funktion för att hämta info om våra varukorgar
@@ -508,22 +510,22 @@ class Cart{
         $query_string = "SELECT id, status FROM carts2 WHERE tokens_id=:token_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false){
+        if($statementHandler !== false){
 
-                $statementHandler->bindParam(":token_id", $token_id_check['id']);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":token_id", $token_id_check['id']);
+            $statementHandler->execute();
 
-                $carts_data = $statementHandler->fetch();
+            $carts_data = $statementHandler->fetch();
 
-                    if(!empty($carts_data)){
+                if(!empty($carts_data)){
 
-                        return $carts_data;
+                    return $carts_data;
 
-                    } else {
+                } else {
                        
-                        return false;
-                    }
-            }
+                    return false;
+                }
+        }
 
     }
 
@@ -532,23 +534,23 @@ class Cart{
         $query_string = "SELECT id, price FROM products WHERE products.id=:product_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false){
+        if($statementHandler !== false){
 
-                $statementHandler->bindParam(":product_id", $product_id);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":product_id", $product_id);
+            $statementHandler->execute();
 
-                $product_data = $statementHandler->fetch();
+            $product_data = $statementHandler->fetch();
 
-                    if(!empty($product_data)){
+            if(!empty($product_data)){
 
-                        return $product_data;
+                return $product_data;
 
-                    } else {
+            } else {
                        
-                        return false;
-                    }
-
+                return false;
             }
+
+        }
        
     }
 

@@ -12,13 +12,13 @@ $order = ( isset($_POST['order']) ? $_POST['order'] : '' );
 if(!empty($token_IN)){
     $retObject = new stdClass;
 
-    if($user_handler->validateToken($token_IN) === false) {
+    if($user_handler->validateToken($token_IN) == false) {
 
         $retObject->error = "Invalid token!";
 
     } else {
-        echo $product_handler->fetchAllProdcuts($selected_option, $order);
-        die();
+
+        $retObject->success = $product_handler->fetchAllProdcuts($selected_option, $order);
     }
 
     echo json_encode($retObject);
