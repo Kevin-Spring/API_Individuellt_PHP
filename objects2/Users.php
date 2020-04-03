@@ -247,14 +247,24 @@ class User{
                             //Det har förmodligen någonting att göra med updateStatus(). Att den kallas på fel ställe eller liknande.
 
                             $return_object->state = "SUCCESS";
-                            $return_object->token = $this->updateToken($return['token']);
+                            $return_object->token = $this->updateStatus($return['token']);
+                            $return_object->newtoken = $this->updateToken($return['token']);
+                            echo " | ";
                             print_r($return['date_updated']);
+                            echo " | ";
+                            print_r($return['token']);
+                            echo " | ";
                             echo "hej från en token som uppdateras efter 15min";
 
                         } else {
                             $return_object->state = "SUCCESS";
                             $return_object->token = $return['token'];
+                            echo " | ";
                             print_r($return['date_updated']);
+                            echo " | ";
+                            print_r($return['token']);
+                            
+                            echo " | ";
                             echo "hej från en token som redan finns!";
 
                         }
@@ -383,7 +393,7 @@ class User{
             $statementHandler->execute();
         }
 
-        $this->updateStatus($token_ID);
+       // $this->updateStatus($token_ID);
 
     }
 
