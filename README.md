@@ -12,7 +12,9 @@
 
 ### OBS. Man måste ha koll på sina produkters id själv!
 
+## I v1 fungerar allt men checkouten raderas efter 15 min eftersom den är bunden till token id:et. Tokens raderas och ersätts med ny efter 15 min dvs.
 
+## I v2 sparas checkouten med respektive cart och token, däremot kan usern bara handla en gång för tillfället. Nu behåller användaren alltid samma token, däremot uppdateras tokenens tid vid varje slagning mot databas.
 
 # Projektplan:
 
@@ -77,7 +79,7 @@
 
 ## Funktioner: camelCase, "jagÄrEnFunktion". 
 
-## $_POST: Försök binda med variabelnamn och one-line if-satser.
+## Klasser: Capitalize, "User, Products, Carts".
 
-## bindParam på alla SQL-frågor.
+
 
