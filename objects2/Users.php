@@ -199,7 +199,7 @@ class User{
 
             $return_object = new stdClass;
 
-            $query_string = "SELECT token, date_updated FROM tokens WHERE user_id=:userID";
+            $query_string = "SELECT id, token, date_updated FROM tokens WHERE user_id=:userID";
             $statementHandler = $this->database_handler->prepare($query_string);
 
             if($statementHandler !== false) {
@@ -208,8 +208,9 @@ class User{
                     $statementHandler->execute();
                     $return = $statementHandler->fetch();
                     
-                    if(!empty($return['token'])) {
+                    if(!empty($return)) {
 
+                        
                         $token_timestamp = $return['date_updated'];
                         $diff = time() - $token_timestamp;
 
@@ -227,6 +228,8 @@ class User{
                             //Därför testar vi nu att ENBART uppdatera tokens oavsett inaktivitet eller aktivitet. Inte radera någonting.
                             //Till skillnad från v1.
 
+
+                            /* ---- Det här funkgerar klockrent med if(($diff / 60) > $this->token_validity_time) ----- */
                             /* $query_string = "DELETE FROM tokens WHERE user_id=:userID";
                             $statementHandler = $this->database_handler->prepare($query_string);
 
@@ -236,13 +239,23 @@ class User{
                             $return_object->state = "SUCCESS";
                             $return_object->token = $this->createToken($userID_IN); */
 
+
+                            /* ---- INGEN ANING OM VARFÖR ----- */
+
+                            //första 15 minuterna fungerar koden som den ska 
+                            //efter 15 min uppdateras token kontinuerligt och förbiser hela if(($diff / 60) > $this->token_validity_time).
+                            //Det har förmodligen någonting att göra med updateStatus(). Att den kallas på fel ställe eller liknande.
+
                             $return_object->state = "SUCCESS";
                             $return_object->token = $this->updateToken($return['token']);
-                            $return_object->token_date = $this->updateStatus($return['token']);
+                            print_r($return['date_updated']);
+                            echo "hej från en token som uppdateras efter 15min";
 
                         } else {
                             $return_object->state = "SUCCESS";
                             $return_object->token = $return['token'];
+                            print_r($return['date_updated']);
+                            echo "hej från en token som redan finns!";
 
                         }
 
@@ -370,6 +383,8 @@ class User{
             $statementHandler->execute();
         }
 
+        $this->updateStatus($token_ID);
+
     }
 
     // Uppdaterar token om användare är aktiv
@@ -384,6 +399,7 @@ class User{
             $statementHandler->bindParam(":token", $token_ID);
 
             $statementHandler->execute();
+            
         }
         
     }
