@@ -238,6 +238,7 @@ class User{
 
                             $return_object->state = "SUCCESS";
                             $return_object->token = $this->updateToken($return['token']);
+                            $return_object->token_date = $this->updateStatus($return['token']);
 
                         } else {
                             $return_object->state = "SUCCESS";
