@@ -16,6 +16,13 @@ if(!empty($token_IN)){
     if(!empty($id_IN)){
 
         $token = $token_IN;
+        
+        $is_admin = $user_handler->isAdmin($token);
+ 
+        if($is_admin === false) {
+            echo "You are not admin!";
+            die();
+        }
 
         if($user_handler->validateToken($token) === false){
             

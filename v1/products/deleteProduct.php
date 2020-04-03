@@ -18,6 +18,13 @@ if(!empty($token_IN)){
 
         $token = $token_IN;
 
+        $is_admin = $user_handler->isAdmin($token);
+ 
+        if($is_admin === false) {
+            echo "You are not admin!";
+            die();
+        }
+
         if($user_handler->validateToken($token) === false){
 
             $retObject->error = "Token is invalid";
