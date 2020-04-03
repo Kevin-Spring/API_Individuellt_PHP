@@ -23,9 +23,9 @@ if(!empty($token_IN)){
 
 
            /*  Metod för att ta bort kundvagn som inte utcheckad */
+            echo $cart_handler->deleteCart($token_IN);
 
         } else {
-
             echo $cart_handler->addToNewCart($productID, $token_IN);
             die();
         }

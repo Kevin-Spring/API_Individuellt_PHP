@@ -4,6 +4,7 @@ include("../../config/database_handler.php");
 class Cart{
 
     private $database_handler;
+    private $cart_validity_time = 15; //minutes
 
     public function __construct($databaseHandler){
 
@@ -261,6 +262,8 @@ class Cart{
     //Funktion för att lägga in samtlig användarinfo i checkout db.
     private function insertIntoCheckout($carts_ID_IN, $firstname_IN, $lastname_IN, $address_IN, $email_IN){
 
+        $this->updateCartStatus($carts_ID_IN);
+
         $query_string = "SELECT SUM(price_data) FROM prodcutsInCarts WHERE carts_id = :cart_id";
 
         $statementHandler = $this->database_handler->prepare($query_string);
@@ -271,6 +274,7 @@ class Cart{
         $total_price = $statementHandler->fetch();
 
         if($total_price["SUM(price_data)"] > 0){
+
 
             $query_string = "INSERT INTO checkout(carts_id, firstname, lastname, address, email, total_price) VALUES(:cart_id_in, :firstname_IN, :lastname_IN, :address_IN, :email_IN, :total_price_IN)"; 
             $statementHandler = $this->database_handler->prepare($query_string);
@@ -285,13 +289,28 @@ class Cart{
                 $statementHandler->bindParam(":total_price_IN", $total_price["SUM(price_data)"]);
                 $statementHandler->execute();
 
+                
+
             } else {
-                echo "statementhandler fucked up!";
+                echo "statementhandler got it wrong in inserIntoCheckout!";
             }
 
         }
 
 
+    }
+
+    private function updateCartStatus($cart_id){
+
+        $query_string = "UPDATE carts2 SET status = 1 WHERE id = :cart_id";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false){
+            $statementHandler->bindParam(":cart_id", $cart_id);
+            $statementHandler->execute();
+        } else {
+            echo "statementhandler in updateCartStatus could not be created";
+        }
     }
 
     //Funktion som stoppar användaren ifrån att skapa flera checkouts med samma id.
@@ -357,13 +376,13 @@ class Cart{
         return json_encode($return_object);
     }
 
-    //Funktion för att kolla om användaren med tokenen redan har en varukorg
+    //Funktion för att kolla om användaren med tokenen redan har en varukorg och om den är utcheckad eller inte.
     //Om inte skapas en ny
     private function validateCart($token_id){
 
         $return_object = new stdClass();
 
-        $query_string = "SELECT COUNT(id) FROM carts2 WHERE tokens_id= :token_id";
+        $query_string = "SELECT COUNT(id), status FROM carts2 WHERE tokens_id= :token_id";
         $statementHandler = $this->database_handler->prepare($query_string);
 
             if($statementHandler !== false ){
@@ -371,19 +390,28 @@ class Cart{
                 $statementHandler->bindParam(":token_id", $token_id);
                 $statementHandler->execute();
 
-                $numberOfCarts = $statementHandler->fetch()[0];
+                $cart_data = $statementHandler->fetch();
 
-                if($numberOfCarts < 1) {
+                if($cart_data['COUNT(id)'] < 1) {
 
                     $this->createCart($token_id);
                     $return_object->state = "SUCCESS!";
                     $return_object->message = "Created cart for user";
 
-            } else {
+                } else {
 
-                $return_object->message = "User already have an active cart";
+                    if($cart_data['status'] == 1){
+                        //$this->createCart($token_id);
+                        echo "User has already made his purchase";
+                        die();
+    
+                    } 
 
-            }
+                    $return_object->message = "User already have an active cart";
+
+                }
+
+                
 
         }
 
@@ -400,6 +428,7 @@ class Cart{
         $statementHandler = $this->database_handler->prepare($query_string);
 
             if($statementHandler !== false){
+                $currentTime = time();
 
                 $statementHandler->bindParam(":token_id_in", $token_id);
                 $statementHandler->execute();
@@ -436,6 +465,7 @@ class Cart{
                     if($token_data['id'] > 1){
 
                         $this->validateCart($token_data['id']);
+                        
 
                         $query_string = "SELECT id FROM carts2 WHERE tokens_id=:token_id";
                         $statementHandler = $this->database_handler->prepare($query_string);
@@ -511,6 +541,56 @@ class Cart{
 
     }
 
+    public function deleteCart($token_id_check){
+        $return_object = new stdClass;
+
+        $query_string = "SELECT id FROM tokens WHERE token=:token";
+        $statementHandler = $this->database_handler->prepare($query_string);
+    
+            if($statementHandler !== false ){
+    
+                $statementHandler->bindParam(":token", $token_id_check);
+                $statementHandler->execute();
+    
+                $token_data = $statementHandler->fetch();
+    
+                    if($token_data['id'] > 1){
+
+                        $query_string = "SELECT id FROM carts2 WHERE tokens_id=:token_id";
+                        $statementHandler = $this->database_handler->prepare($query_string);
+
+                        $statementHandler->bindParam(":token_id", $token_data['id']);
+                        $statementHandler->execute();
+
+                        $carts_data = $statementHandler->fetch();
+
+                        if($carts_data['id'] > 1){
+
+                            if($carts_data['status'] !==  1){
+                                $query_string = "DELETE FROM carts2 WHERE id=:carts_id";
+                                $statementHandler = $this->database_handler->prepare($query_string);
+        
+                                $statementHandler->bindParam(':carts_id', $carts_data['id']);
+                                $statementHandler->execute();
+                            } else {
+                                $return_object->state = "ERROR";
+                                $return_object->message = "Cannot delete already checked out cart!";
+                            }
+
+                            $return_object->state = "ERROR";
+                            $return_object->message = "Cannot find cart!";
+
+                        }
+                        $return_object->state = "ERROR";
+                        $return_object->message = "Cannot find token!";
+                    }
+                    $return_object->state = "ERROR";
+                    $return_object->message = "Satetement handler messed up!";
+                }
+
+                return json_encode($return_object);
+
+            }
     
 
 }

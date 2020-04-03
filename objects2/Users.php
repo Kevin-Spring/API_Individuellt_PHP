@@ -215,14 +215,29 @@ class User{
 
                         if(($diff / 60) > $this->token_validity_time) {
 
-                            $query_string = "DELETE FROM tokens WHERE user_id=:userID";
+                            //Om en token inte raderas ur token tabellen vid inaktivitet, utan bara uppdaterar tokens timestamp-värde varje gång man loggar in.
+                            //Så kommer inte cartsen försvinna, med andra ord kommer inte checkouten försvinna.
+                            //Då får en inloggad user alltid samma token id och token, men det är nytt timestamp-värde i den varje gång något slår mot databasen.
+                            //För att då radera en cart vid inaktivitet och spara carts som har blivit utcheckade kan vi lägga in ytterligare en kolumn i tabellen carts.
+                            //Nya tabellen med namnet t.ex. ”status” kommer vara beroende av värdet i den kolumnen och våra sql-frågor kommer då radera de som är inaktiva och spara de som har ”status = utcheckad” exempelvis.
+                            //Då får alla nyskapade carts ha ett DEFAULT-VÄRDE i status-kolumnen som indikerar att de inte checkats ut.
+                            //Och när vi checkar ut får cartsens ”status-värden” då bli ändrade.
+                            //Då kommer vi kunna se vilka våra utcheckade carts är i checkouten.
+
+                            //Därför testar vi nu att ENBART uppdatera tokens oavsett inaktivitet eller aktivitet.
+
+                            /* $query_string = "DELETE FROM tokens WHERE user_id=:userID";
                             $statementHandler = $this->database_handler->prepare($query_string);
 
                             $statementHandler->bindParam(':userID', $userID_IN);
                             $statementHandler->execute();
 
                             $return_object->state = "SUCCESS";
-                            $return_object->token = $this->createToken($userID_IN);
+                            $return_object->token = $this->createToken($userID_IN); */
+
+                            $return_object->state = "SUCCESS";
+                            $return_object->token = $return['token'];
+                            $this->updateStatus($return['token']);
 
                         } else {
                             $return_object->state = "SUCCESS";
