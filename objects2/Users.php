@@ -228,24 +228,6 @@ class User{
                             //Därför testar vi nu att ENBART uppdatera tokens oavsett inaktivitet eller aktivitet. Inte radera någonting.
                             //Till skillnad från v1.
 
-
-                            /* ---- Det här funkgerar klockrent med if(($diff / 60) > $this->token_validity_time) ----- */
-                            /* $query_string = "DELETE FROM tokens WHERE user_id=:userID";
-                            $statementHandler = $this->database_handler->prepare($query_string);
-
-                            $statementHandler->bindParam(':userID', $userID_IN);
-                            $statementHandler->execute();
-
-                            $return_object->state = "SUCCESS";
-                            $return_object->token = $this->createToken($userID_IN); */
-
-
-                            /* ---- INGEN ANING OM VARFÖR ----- */
-
-                            //första 15 minuterna fungerar koden som den ska 
-                            //efter 15 min uppdateras token kontinuerligt och förbiser hela if(($diff / 60) > $this->token_validity_time).
-                            //Det har förmodligen någonting att göra med updateStatus(). Att den kallas på fel ställe eller liknande.
-
                             $return_object->state = "SUCCESS";
                             $return_object->newtokendate = $this->updateStatus($return['token']);
                             $return_object->newtoken = $this->updateToken($return['token']);
