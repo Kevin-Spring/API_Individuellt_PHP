@@ -163,8 +163,8 @@ class User{
 
                     $this->username = $return['username'];
 
-                    $return_object->state = "SUCCESS";
-                    $return_object->token = $this->getToken($return['id'], $return['username']);
+                    $return_object->state = "SUCCESS IN LoginUser";
+                    $return_object->token = $this->getToken($return['id']);
 
                 } else {
                     $return_object->state = "ERROR";
@@ -247,30 +247,19 @@ class User{
                             //Det har förmodligen någonting att göra med updateStatus(). Att den kallas på fel ställe eller liknande.
 
                             $return_object->state = "SUCCESS";
-                            $return_object->token = $this->updateStatus($return['token']);
+                            $return_object->newtokendate = $this->updateStatus($return['token']);
                             $return_object->newtoken = $this->updateToken($return['token']);
-                            echo " | ";
-                            print_r($return['date_updated']);
-                            echo " | ";
-                            print_r($return['token']);
-                            echo " | ";
                             echo "hej från en token som uppdateras efter 15min";
 
                         } else {
-                            $return_object->state = "SUCCESS";
+                            $return_object->state = "SUCCESS in token thats already in place";
                             $return_object->token = $return['token'];
-                            echo " | ";
-                            print_r($return['date_updated']);
-                            echo " | ";
-                            print_r($return['token']);
-                            
-                            echo " | ";
                             echo "hej från en token som redan finns!";
 
                         }
 
                     } else {
-                        $return_object->state = "SUCCESS";
+                        $return_object->state = "SUCCESS in CreateToken";
                         $return_object->token = $this->createToken($userID_IN);
                     }
 
@@ -381,6 +370,8 @@ class User{
     //Funktion för att ge användaren ny token vid inaktivitet.
     private function updateToken($token_ID){
 
+        $return_object = new stdClass;
+
         $query_string = "UPDATE tokens SET token = :new_token WHERE token = :token";
         $statementHandler = $this->database_handler->prepare($query_string);
 
@@ -390,15 +381,28 @@ class User{
             $statementHandler->bindParam(":new_token", $new_token);
             $statementHandler->bindParam(":token", $token_ID);
 
-            $statementHandler->execute();
+            $return = $statementHandler->execute();
+
+            if(!empty($return)){
+                $return_object->state = "SUCCESS";
+                $return_object->token = $new_token;
+            }
+
+        } else {
+
+            $return_object->state = "Error";
+            $return_object->token = "could not create statementHandler in updateToken()";
+
         }
 
-       // $this->updateStatus($token_ID);
+        return json_encode($return_object);
 
     }
 
     // Uppdaterar token om användare är aktiv
      private function updateStatus($token_ID){
+
+        $return_object = new stdClass;
 
         $query_string = "UPDATE tokens SET date_updated = :date_updated_new WHERE token = :token";
         $statementHandler = $this->database_handler->prepare($query_string);
@@ -409,10 +413,25 @@ class User{
             $statementHandler->bindParam(":token", $token_ID);
 
             $statementHandler->execute();
-            
+
+            $return = $statementHandler->execute();
+
+            if(!empty($return)){
+                $return_object->state = "SUCCESS";
+                $return_object->tokenTime = $new_current_time;
+            }
+
+        } else {
+
+            $return_object->state = "Error";
+            $return_object->token = "could not create statementHandler in updateStatus()";
+
         }
+
+        return json_encode($return_object);
+            
+     }
         
-    }
 
         private function getUserId($token){
             $return_object = new stdClass;
