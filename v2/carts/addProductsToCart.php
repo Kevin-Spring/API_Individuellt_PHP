@@ -18,14 +18,16 @@ if(!empty($token_IN)){
     if(!empty($productID)){
 
         if($user_handler->validateToken($token_IN) === false){
+
+            echo "janenneene";
             
             $retObject->error = "Token is invalid";
 
 
            /*  Metod för att ta bort kundvagn som inte utcheckad */
+            echo $cart_handler->deleteCart($token_IN);
 
         } else {
-
             echo $cart_handler->addToNewCart($productID, $token_IN);
             die();
         }

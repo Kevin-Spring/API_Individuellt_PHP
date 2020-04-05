@@ -22,6 +22,8 @@ if(!empty($token_IN)){
             
         $retObject->error = "Token is invalid";
 
+        echo $cart_handler->deleteCart($token_IN);
+
     } else {
 
         echo $cart_handler->checkout($token_IN, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
