@@ -99,7 +99,7 @@ class Cart{
     
             $statementHandler->bindParam(":cart_id", $cart_id);
             $statementHandler->execute();
-            $return = $statementHandler->fetchAll();
+            $return = $statementHandler->fetchAll(PDO::FETCH_ASSOC);
 
             if(!empty($return)){
                 $return_object->state = "SUCCESS";
@@ -325,33 +325,29 @@ class Cart{
         return json_encode($return_object);
     }
 
-    //Funktion för att kolla om användaren med tokenen redan har en varukorg och om den är utcheckad eller inte.
-    //Om inte skapas en ny
+    //Den här funktionen är lite som en växellåda.
+    //Om det inte finns någon aktiv varukorg med status 0 skapas en ny varukorg och id:et returneras.
+    //Om det redan finns en aktiv varukorg kommer id:et på den varukorgen returneras.
+    //Det här gör det möjligt att lägga produkter i varukorg i samma skede som den skapas,
+    //och fortsätta lägga i saker närden väl är skapad.
     private function validateCart($token_id){
-
-        $return_object = new stdClass();
 
         $check_cart_status = $this->getCartId($token_id);
 
-            if($check_cart_status['id'] < 1) {
-
-                $this->createCart($token_id);
-                $return_object->state = "SUCCESS!";
-                $return_object->message = "Created cart for user";
+            if(empty($check_cart_status)) {
+                
+                return $this->createCart($token_id)['id'];
 
             } else {
 
-                $return_object->message = "User already have an active cart";
-
+                return $check_cart_status['id'];
+                
             }
             
-        return json_encode($return_object);
     }
 
     //Funktion för att skapa ny varukorg
     private function createCart($token_id){
-
-        $return_object = new stdClass();
 
         $query_string = "INSERT INTO carts2(tokens_id) VALUES(:token_id_in)"; 
         $statementHandler = $this->database_handler->prepare($query_string);
@@ -360,16 +356,27 @@ class Cart{
 
                 $statementHandler->bindParam(":token_id_in", $token_id);
                 $statementHandler->execute();
-                    
-                $return_object->state = "SUCCESS";
-                $return_object->message = "Created a cart for user.";
+
+                $last_inserted_cart_id = $this->database_handler->lastInsertId();
+
+                $query_string = "SELECT id FROM carts2 WHERE id=:last_cart_id";
+                $statementHandler = $this->database_handler->prepare($query_string);
+
+                $statementHandler->bindParam(':last_cart_id', $last_inserted_cart_id);
+
+                $statementHandler->execute();
+
+                $result = $statementHandler->fetch();
+                
+                if(!empty($result)){
+
+                    return $result;
+
+                }
                     
             } else {
-                $return_object->state = "ERROR";
-                $return_object->message = "Could not create statementhadnler";
+                return false;
             } 
-
-        return json_encode($return_object);
 
     }
 
@@ -384,25 +391,25 @@ class Cart{
             
             if(!empty($check_token)){
                     
-                    $this->validateCart($check_token);
-                    //$this->createCart($token_id);
+                    $last_inserted_cart_id = $this->validateCart($check_token);
 
                     $product_data = $this->getProductData($product_id);
         
                     if(!empty($product_data)){
         
-                        $return = $this->insertNewCartToDatabase($product_id, $check_cart['id'], $product_data['price'], $token_id);
-        
+                        $return = $this->insertNewCartToDatabase($product_id, $last_inserted_cart_id, $product_data['price'], $token_id);
+                        
                             if($return !==false){ 
                                 $return_object->state = "SUCCESS";
                                 $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
-                                $return_object->products_in_cart = $this->getCartItems($check_cart['id']);
+                                $return_object->products_in_cart = $this->getCartItems($last_inserted_cart_id);
                             }
         
                         } else {
                             $return_object->state = "ERROR";
                             $return_object->message = "Could not find that specific product!";
                         }
+
                     }
                       
             return json_encode($return_object);
@@ -411,8 +418,6 @@ class Cart{
 
     //Vår funktion för att faktiskt lägga in produkten och användarens token i databasen.
     private function insertNewCartToDatabase($product_ID_IN, $carts_ID_IN, $price_data){
-
-        $return_object = new stdClass;
 
             $query_string = "INSERT INTO prodcutsInCarts(products_id, carts_id, price_data) VALUES(:productID, :cartID, :price_data)";
             $statementHandler = $this->database_handler->prepare($query_string);
@@ -425,13 +430,10 @@ class Cart{
     
                 $statementHandler->execute();
     
-                return true;
-    
                 } else {
                     return false;
                 }
 
-            return json_encode($return_object);
         } 
 
         
