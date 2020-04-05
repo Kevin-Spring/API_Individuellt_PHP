@@ -186,7 +186,7 @@ class Cart{
 
             } else {
                 $return_object->state = "ERROR";
-                $return_object->message = "Could not check out order!";
+                $return_object->message = "Could not check out order, please check if you cart is empty!";
             }
 
         } else {
@@ -249,8 +249,6 @@ class Cart{
     }
 
     //Funktion som stoppar användaren ifrån att skapa flera checkouts med samma id.
-    //Överflödig nu i v2 när en användare bara kan handla en gång och dessutom kommer knytas an till flera varukorgar om användaren kan handla fler gånger.
-    //Just nu fungerar den som en portal till insertIntoCheckout().
     private function validateCheckout($token_id_in, $cart_id,$firstname_IN, $lastname_IN, $address_IN, $email_IN){
         
         $return_object = new stdClass();
@@ -259,35 +257,50 @@ class Cart{
 
         if(!empty($check_cart_status)){
 
-            $query_string = "SELECT COUNT(id) FROM checkout WHERE carts_id= :cart_id";
+            $query_string = "SELECT products_id FROM prodcutsInCarts WHERE carts_id = :cart_id";
             $statementHandler = $this->database_handler->prepare($query_string);
-
-                if($statementHandler !== false ){
+            if($statementHandler !== false ){
 
                 $statementHandler->bindParam(":cart_id", $cart_id['id']);
                 $statementHandler->execute();
 
-                $numberOfCarts = $statementHandler->fetch()[0];
+                $items_in_carts = $statementHandler->fetchAll();
 
-                    if($numberOfCarts < 1) {
+                if(!empty($items_in_carts)){
 
-                        $return_object->state = "SUCCESS!";
-                        $return_object->cart = $this->insertIntoCheckout($cart_id, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
-
+                    $query_string = "SELECT COUNT(id) FROM checkout WHERE carts_id= :cart_id";
+                    $statementHandler = $this->database_handler->prepare($query_string);
+        
+                        if($statementHandler !== false ){
+        
+                        $statementHandler->bindParam(":cart_id", $cart_id['id']);
+                        $statementHandler->execute();
+        
+                        $numberOfCarts = $statementHandler->fetch()[0];
+        
+                            if($numberOfCarts < 1) {
+        
+                                $return_object->state = "SUCCESS!";
+                                $return_object->cart = $this->insertIntoCheckout($cart_id, $firstname_IN, $lastname_IN, $address_IN, $email_IN);
+        
+                            } else {
+        
+                                $return_object->message = "User already have an active cart";
+        
+                            }
+        
+                        } else {
+                            $return_object->state = "ERROR";
+                            $return_object->message = "Statementhandler couldnt be created in validateCheckout";
+                        }
+        
                     } else {
-
-                        $return_object->message = "User already have an active cart";
-
+                        return false;
                     }
-
                 } else {
                     $return_object->state = "ERROR";
                     $return_object->message = "Statementhandler couldnt be created in validateCheckout";
                 }
-
-            } else {
-                $return_object->state = "ERROR";
-                $return_object->message = "Couldn't fint that cart!";
             }
 
         return json_encode($return_object);
@@ -314,7 +327,7 @@ class Cart{
 
             } else {
                 $return_object->state = "ERROR";
-                $return_object->message = "Cannot find cart!";
+                $return_object->message = "Please add products to your cart!";
             }
 
 
