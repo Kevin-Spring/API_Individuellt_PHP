@@ -19,12 +19,12 @@ class Cart{
         $check_token = $this->getTokenId($token_id);
         $check_cart = $this->getCartId($check_token);
 
-        $carts_data = $check_cart;
+        $carts_data = $check_cart['id'];
 
-        if(!empty($carts_data)){
+        if($carts_data !== false){
 
             //Om vårt fetchade id från token tabellen existerar skickar vi med det tillsammans med produktens id med vår removeFromCartDb funktion.
-            $return = $this->removeFromCartDb($product_id);
+            $return = $this->removeFromCartDb($product_id, $carts_data);
 
             if($return !== false){
                 $return_object->state = "SUCCESS";
@@ -46,19 +46,20 @@ class Cart{
     } 
 
     //Funktion för att radera produkter från databas som ligger användares i varukorg
-    private function removeFromCartDb($product_id){
+    private function removeFromCartDb($product_id, $carts_data){
 
         $return_object = new stdClass();
 
         //Med hjälp av LIMIT 1 tas bara en produkt bort.
         //Vilket är användbart om vi har fler av samma produkt.
         //Då raderas endast den med lägst id.
-        $query_string = "DELETE FROM prodcutsInCarts WHERE products_id = :product_id LIMIT 1";
+        $query_string = "DELETE FROM prodcutsInCarts WHERE products_id = :product_id AND carts_id = :carts_data LIMIT 1";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false){
 
             $statementHandler->bindParam(":product_id", $product_id);
+            $statementHandler->bindParam(":carts_data", $carts_data);
 
             $return = $this->getSingleCartItem($product_id);
 
