@@ -61,7 +61,7 @@ class Cart{
             $statementHandler->bindParam(":product_id", $product_id);
             $statementHandler->bindParam(":carts_data", $carts_data);
 
-            $return = $this->getSingleCartItem($product_id);
+            $return = $this->getSingleCartItem($product_id, $carts_data);
 
                 if($return !== false){
 
@@ -122,15 +122,16 @@ class Cart{
 
     //Funktion som hämtar specifik produkt från vår varukorg.
     //Främst för att kunna använda den i funktionen removeFromCart
-    private function getSingleCartItem($product_id_remove){
+    private function getSingleCartItem($product_id_remove, $carts_data){
         $return_object = new stdClass;
 
-        $query_string = "SELECT products_id FROM prodcutsInCarts WHERE products_id = :product_id_remove";
+        $query_string = "SELECT products_id FROM prodcutsInCarts WHERE products_id = :product_id_remove AND carts_id = :carts_data";
         $statementHandler = $this->database_handler->prepare($query_string);
 
         if($statementHandler !== false){
 
             $statementHandler->bindParam(":product_id_remove", $product_id_remove);
+            $statementHandler->bindParam(":carts_data", $carts_data);
             $statementHandler->execute();
 
             $return = $statementHandler->fetch();
@@ -395,40 +396,40 @@ class Cart{
     }
 
 
-        /* Funktion för att lägga till saker i användarens varukorg */
-        public function addToNewCart($product_id, $token_id){
+    /* Funktion för att lägga till saker i användarens varukorg */
+    public function addToNewCart($product_id, $token_id){
             
-            $return_object = new stdClass;
+        $return_object = new stdClass;
     
-            $check_token = $this->getTokenId($token_id);
-            $check_cart = $this->getCartId($check_token);
+        $check_token = $this->getTokenId($token_id);
+        $check_cart = $this->getCartId($check_token);
             
             if(!empty($check_token)){
                     
-                    $last_inserted_cart_id = $this->validateCart($check_token);
+                $last_inserted_cart_id = $this->validateCart($check_token);
 
-                    $product_data = $this->getProductData($product_id);
+                $product_data = $this->getProductData($product_id);
         
                     if(!empty($product_data)){
         
-                        $return = $this->insertNewCartToDatabase($product_id, $last_inserted_cart_id, $product_data['price'], $token_id);
+                    $return = $this->insertNewCartToDatabase($product_id, $last_inserted_cart_id, $product_data['price'], $token_id);
                         
-                            if($return !==false){ 
-                                $return_object->state = "SUCCESS";
-                                $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
-                                $return_object->products_in_cart = $this->getCartItems($last_inserted_cart_id);
-                            }
+                        if($return !==false){ 
+                            $return_object->state = "SUCCESS";
+                            $return_object->message = "Product " . $product_id . " was added to your shoppingcart";
+                            $return_object->products_in_cart = $this->getCartItems($last_inserted_cart_id);
+                        }
         
                         } else {
                             $return_object->state = "ERROR";
                             $return_object->message = "Could not find that specific product!";
                         }
 
-                    }
+            }
                       
-            return json_encode($return_object);
+        return json_encode($return_object);
     
-        } 
+    } 
 
     //Vår funktion för att faktiskt lägga in produkten och användarens token i databasen.
     private function insertNewCartToDatabase($product_ID_IN, $carts_ID_IN, $price_data){
