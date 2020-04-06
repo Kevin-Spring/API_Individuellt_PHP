@@ -8,6 +8,7 @@ $user_handler = new User($databaseHandler);
 $token_IN = ( isset($_POST['token']) ? $_POST['token'] : '' );
 $selected_option = ( isset($_POST['category']) ? $_POST['category'] : '' );
 $order = ( isset($_POST['order']) ? $_POST['order'] : '' );
+$page = ( isset($_POST['page']) ? $_POST['page'] : '' );
 
 if(!empty($token_IN)){
     $retObject = new stdClass;
@@ -18,7 +19,12 @@ if(!empty($token_IN)){
 
     } else {
 
-        $retObject->success = $product_handler->fetchAllProdcuts($selected_option, $order);
+        if($page == 1){
+            $retObject->success = $product_handler->fetchAllProdcuts($selected_option, $order);
+        } else {
+            $retObject->success = $product_handler->fetchAllProdcutsOffset($selected_option, $order);
+        }
+        
     }
 
     echo json_encode($retObject);

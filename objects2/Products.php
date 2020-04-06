@@ -51,12 +51,12 @@ class Product{
 
     }
     
-    //Funktion som hämtar alla våra produkter
+    //Funktion som hämtar alla våra produkter för page 1.
     public function fetchAllProdcuts($category, $order) {
 
     $return_object = new stdClass();
     
-    $query_string = "SELECT id, title, content, category, price, date_posted FROM products WHERE category LIKE :category ORDER BY date_posted $order";
+    $query_string = "SELECT id, title, content, price FROM products WHERE category LIKE :category ORDER BY date_posted $order LIMIT 5 OFFSET 0";
     $statementHandler = $this->database_handler->prepare($query_string);
     
         if($statementHandler !== false) {
@@ -77,6 +77,34 @@ class Product{
         return json_encode($return_object);
             
         }
+
+    //Funktion som hämtar alla våra produkter för page 2.
+    public function fetchAllProdcutsOffset($category, $order) {
+
+        $return_object = new stdClass();
+            
+        $query_string = "SELECT id, title, content, price FROM products WHERE category LIKE :category ORDER BY date_posted $order LIMIT 5 OFFSET 5";
+        $statementHandler = $this->database_handler->prepare($query_string);
+            
+            if($statementHandler !== false) {
+            
+                $statementHandler->bindParam(":category", $category);
+                $statementHandler->execute();
+                $return = $statementHandler->fetchAll(PDO::FETCH_ASSOC);
+        
+                $return_object->state = "SUCCESS";
+                $return_object->products = $return;
+            
+            } else {
+                $return_object->state = "ERROR";
+                $return_object->message = "Something went wrong when trying to FETCH ALL products";
+                die();
+            }
+        
+        return json_encode($return_object);
+                    
+    }
+        
 
     //Funktion som är överflödig, vad gör den här?
     //Fin är den iaf.
