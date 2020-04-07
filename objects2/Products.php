@@ -35,7 +35,7 @@ class Product{
             $return_object->message = "product: ". $product_id." was not found";
             //Här måste jag echo:a ut mitt errormeddelande eftersom deleteProduct behöver "return false" för att kunna fungera korrekt.
             //Om jag bara skulle returnera false visas inget felmeddelande när den här funktionen körs ensam.
-            //Finns säkert bättre lösning.
+            //Finns 100% en bättre lösning.
             echo json_encode($return_object);
             return false;
             
@@ -44,7 +44,6 @@ class Product{
     } else {
             $return_object->state = "ERROR";
             $return_object->message = "Something went wrong with STATEMENTHANDLER";
-        die();
     }
 
     return json_encode($return_object);
@@ -54,10 +53,10 @@ class Product{
     //Funktion som hämtar alla våra produkter för page 1.
     public function fetchAllProdcuts($category, $order) {
 
-    $return_object = new stdClass();
-    
-    $query_string = "SELECT id, title, content, price FROM products WHERE category LIKE :category ORDER BY date_posted $order LIMIT 5 OFFSET 0";
-    $statementHandler = $this->database_handler->prepare($query_string);
+        $return_object = new stdClass();
+        
+        $query_string = "SELECT id, title, content, price FROM products WHERE category LIKE :category ORDER BY date_posted $order LIMIT 5 OFFSET 0";
+        $statementHandler = $this->database_handler->prepare($query_string);
     
         if($statementHandler !== false) {
     
@@ -76,7 +75,7 @@ class Product{
 
         return json_encode($return_object);
             
-        }
+    }
 
     //Funktion som hämtar alla våra produkter för page 2.
     public function fetchAllProdcutsOffset($category, $order) {

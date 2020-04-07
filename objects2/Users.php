@@ -231,12 +231,10 @@ class User{
                             $return_object->state = "SUCCESS";
                             $return_object->newtokendate = $this->updateStatus($return['token']);
                             $return_object->newtoken = $this->updateToken($return['token']);
-                            echo "hej från en token som uppdateras efter 15min";
 
                         } else {
                             $return_object->state = "SUCCESS in token thats already in place";
                             $return_object->token = $return['token'];
-                            echo "hej från en token som redan finns!";
 
                         }
 
