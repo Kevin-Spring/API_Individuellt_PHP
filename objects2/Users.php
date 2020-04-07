@@ -9,12 +9,11 @@ class User{
     private $username;
     private $token_validity_time = 15; //minutes
 
-    public function __construct($database_handler_IN)
-       {
+    public function __construct($database_handler_IN){
            $this->database_handler = $database_handler_IN;
-       }
+    }
 
-       public function addUser($username_IN, $password_IN, $email_IN) {
+    public function addUser($username_IN, $password_IN, $email_IN) {
         //Startar en standardklass för json objektet
         $return_object = new stdClass();
 
@@ -50,56 +49,56 @@ class User{
             
         //returnera ett json_encode:at svar med informationen.
         return json_encode($return_object);
-       }
+    }
        
        //Funktion för att registrera användare i databasen.
-       private function insertUserToDatabase($username_param, $password_param, $email_param) {
+    private function insertUserToDatabase($username_param, $password_param, $email_param) {
 
-            $query_string = "INSERT INTO users (username, password, email) VALUES(:username, :password, :email)";
+        $query_string = "INSERT INTO users (username, password, email) VALUES(:username, :password, :email)";
+        $statementHandler = $this->database_handler->prepare($query_string);
+
+        if($statementHandler !== false ){
+
+            $encrypted_password = md5($password_param);
+
+            $statementHandler->bindParam(':username', $username_param);
+            $statementHandler->bindParam(':password', $encrypted_password);
+            $statementHandler->bindParam(':email', $email_param);
+
+            $statementHandler->execute();
+
+            //För att kunna hämta json-objektet behöver vi hämta informationen vi precis la in i databasen.
+            $last_inserted_user_id = $this->database_handler->lastInsertId();
+
+            $query_string = "SELECT id, username, email FROM users WHERE id=:last_user_id";
             $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false ){
+            $statementHandler->bindParam(':last_user_id', $last_inserted_user_id);
 
-                $encrypted_password = md5($password_param);
+            $statementHandler->execute();
 
-                $statementHandler->bindParam(':username', $username_param);
-                $statementHandler->bindParam(':password', $encrypted_password);
-                $statementHandler->bindParam(':email', $email_param);
-
-                $statementHandler->execute();
-
-                //För att kunna hämta json-objektet behöver vi hämta informationen vi precis la in i databasen.
-                $last_inserted_user_id = $this->database_handler->lastInsertId();
-
-                $query_string = "SELECT id, username, email FROM users WHERE id=:last_user_id";
-                $statementHandler = $this->database_handler->prepare($query_string);
-
-                $statementHandler->bindParam(':last_user_id', $last_inserted_user_id);
-
-                $statementHandler->execute();
-
-                return $statementHandler->fetch();
+            return $statementHandler->fetch();
                 
 
-            } else {
-                return false;
-            }
+        } else {
+            return false;
+        }
 
 
-       }
+    }
 
-       //Funktion för att kika om användarnamn redan är upptaget
-       private function isUsernameTaken( $username_param ) {
+    //Funktion för att kika om användarnamn redan är upptaget
+    private function isUsernameTaken( $username_param ) {
 
-            $query_string = "SELECT COUNT(id) FROM users WHERE username=:username";
-            $statementHandler = $this->database_handler->prepare($query_string);
+        $query_string = "SELECT COUNT(id) FROM users WHERE username=:username";
+        $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false ){
+        if($statementHandler !== false ){
 
-                $statementHandler->bindParam(":username", $username_param);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":username", $username_param);
+            $statementHandler->execute();
 
-                $numberOfUsernames = $statementHandler->fetch()[0];
+            $numberOfUsernames = $statementHandler->fetch()[0];
 
                 if($numberOfUsernames > 0) {
                     return true; 
@@ -108,38 +107,38 @@ class User{
                 }
 
 
-            } else {
-                echo "Statementhandler epic fail!";
-                die;
-            }
+        } else {
+            echo "Statementhandler epic fail!";
+            die;
         }
+    }
 
 
         
-        //Funktion för att bolla med databasen om mailadressen är taget.
-        private function isEmailTaken( $email_param ) {
-            $query_string = "SELECT COUNT(id) FROM users WHERE email=:email";
-            $statementHandler = $this->database_handler->prepare($query_string);
+    //Funktion för att bolla med databasen om mailadressen är taget.
+    private function isEmailTaken( $email_param ) {
+        $query_string = "SELECT COUNT(id) FROM users WHERE email=:email";
+        $statementHandler = $this->database_handler->prepare($query_string);
 
-            if($statementHandler !== false ){
+        if($statementHandler !== false ){
 
-                $statementHandler->bindParam(":email", $email_param);
-                $statementHandler->execute();
+            $statementHandler->bindParam(":email", $email_param);
+            $statementHandler->execute();
 
-                $numberOfUsers = $statementHandler->fetch()[0];
+            $numberOfUsers = $statementHandler->fetch()[0];
 
-                if($numberOfUsers > 0) {
-                    return true; 
-                } else {
-                    return false;
-                }
-
-
+            if($numberOfUsers > 0) {
+                return true; 
             } else {
-                echo "Statementhandler epic fail!";
-                die;
+                return false;
             }
+
+
+        } else {
+            echo "Statementhandler epic fail!";
+            die;
         }
+    }
 
 
         //Funktion för att logga in användare
@@ -482,7 +481,6 @@ class User{
             }
 
         }
-    
     
 }
 

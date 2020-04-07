@@ -18,8 +18,6 @@ if(!empty($token_IN)){
     if(!empty($productID)){
 
         if($user_handler->validateToken($token_IN) === false){
-
-            echo "janenneene";
             
             $retObject->error = "Token is invalid";
 

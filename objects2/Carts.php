@@ -85,8 +85,6 @@ class Cart{
         return json_encode($return_object);
     }
 
-
-
     //Tänka sig, ytterligare en funktion...
     //Funktion som hämtar produkterna som ligger i vår varukorg.
     private function getCartItems($cart_id){
@@ -449,9 +447,7 @@ class Cart{
                     return false;
                 }
 
-        } 
-
-        
+    } 
 
     //Funktion för att ta bort varukorgar som inte har checkats ut.
     //Detta baseras på om tokenen har gått ut och kallas på i våra cart-endpoints.
@@ -555,4 +551,6 @@ class Cart{
     }
 
 }
+
+
 ?>
