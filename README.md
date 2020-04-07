@@ -10,11 +10,13 @@
 
 ## 4. Lek omkring!
 
-### OBS. Man måste ha koll på sina produkters id själv!
+## Finns en hårdkodad admin med username: admin & password: admin, som kan lägga till, redigera och ta bort produkter.
+
+### OBS. Man måste ha koll på sina produkters id själv! Är medveten om att tabellen "prodcutsInCarts" är felstavad i db och det har inte varit lätt haha.
 
 ## I v1 fungerar allt men checkouten raderas efter 15 min eftersom den är bunden till token id:et. Tokens raderas och ersätts med ny efter 15 min dvs.
 
-## I v2 sparas checkouten med respektive cart och token, däremot kan usern bara handla en gång för tillfället. Nu behåller användaren alltid samma token, däremot uppdateras tokenens tid vid varje slagning mot databas.
+## I v2 sparas checkouten med respektive cart och token. Nu behåller användaren alltid samma token, däremot uppdateras tokenens kod & tid vid varje slagning mot databas.
 
 # Projektplan:
 
